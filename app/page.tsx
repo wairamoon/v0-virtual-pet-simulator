@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { PixSimCreate, type PixSimData } from "@/components/pixsim-create"
 import { PixSimDashboard } from "@/components/pixsim-dashboard"
 import { AeroBackground } from "@/components/aero-background"
+import { UserHeader } from "@/components/user-header"
 
 const STORAGE_KEY = "pixsim-data"
 
@@ -61,6 +62,7 @@ export default function PixSimApp() {
   return (
     <main>
       <AeroBackground />
+      <UserHeader />
       {data ? (
         <PixSimDashboard data={data} onReset={handleReset} />
       ) : (

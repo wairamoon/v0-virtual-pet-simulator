@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Orbitron } from 'next/font/google'
+import { PrivyProvider } from '@/components/privy-provider'
 
 import './globals.css'
 
@@ -27,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${orbitron.variable} font-sans antialiased`}>{children}</body>
+      <body className={`${orbitron.variable} font-sans antialiased`}>
+        <PrivyProvider>{children}</PrivyProvider>
+      </body>
     </html>
   )
 }
