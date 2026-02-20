@@ -275,6 +275,7 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
                     <CharacterAvatar
                       parts={character}
                       energyColor={selectedEnergyColor}
+                      identity={identity ?? "femenino"}
                       size={140}
                     />
                   </div>

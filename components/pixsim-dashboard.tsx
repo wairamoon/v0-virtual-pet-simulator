@@ -153,6 +153,7 @@ export function PixSimDashboard({
                 <CharacterAvatar
                   parts={data.character ?? defaultParts}
                   energyColor={color}
+                  identity={data.identity}
                   size={150}
                 />
               </div>

@@ -33,36 +33,40 @@ export const skinTones = [
   { value: "#8d5e3c", label: "Oscuro" },
 ]
 
-const outfitImages: Record<number, string> = {
-  0: "/images/outfits/cyber-suit.webp",
-  1: "/images/outfits/hoodie.webp",
-  2: "/images/outfits/armor.webp",
-  3: "/images/outfits/dress.webp",
-}
-
-// Map energy color to CSS hue-rotate degrees (base images are blue-toned)
-const hueMap: Record<string, string> = {
-  "#00bcd4": "0deg",     // water/cyan — close to base blue, minimal rotation
-  "#ff5722": "160deg",   // fire/orange-red
-  "#4caf50": "90deg",    // earth/green
-  "#4a9eff": "0deg",     // legacy blue
-  "#9c7cf4": "270deg",   // legacy violet
-  "#e0457b": "320deg",   // legacy pink
-  "#40aa40": "90deg",    // legacy green
-  "#ff8c00": "30deg",    // legacy amber
+// Image map: identity -> outfit -> image path
+const outfitImages: Record<string, Record<number, string>> = {
+  femenino: {
+    0: "/images/outfits/f-cyber-suit.webp",
+    1: "/images/outfits/f-hoodie.webp",
+    2: "/images/outfits/f-armor.webp",
+    3: "/images/outfits/f-dress.webp",
+  },
+  masculino: {
+    0: "/images/outfits/m-cyber-suit.webp",
+    1: "/images/outfits/m-hoodie.webp",
+    2: "/images/outfits/m-armor.webp",
+    3: "/images/outfits/m-dress.webp",
+  },
+  "sin-genero": {
+    0: "/images/outfits/n-cyber-suit.webp",
+    1: "/images/outfits/n-hoodie.webp",
+    2: "/images/outfits/n-armor.webp",
+    3: "/images/outfits/n-dress.webp",
+  },
 }
 
 interface Props {
   parts: CharacterParts
   energyColor: string
+  identity: string
   size?: number
   className?: string
 }
 
-export function CharacterAvatar({ parts, energyColor, size = 200, className = "" }: Props) {
+export function CharacterAvatar({ parts, energyColor, identity, size = 200, className = "" }: Props) {
   const { outfit } = parts
-  const src = outfitImages[outfit] ?? outfitImages[0]
-  const hue = hueMap[energyColor] ?? "0deg"
+  const identityMap = outfitImages[identity] ?? outfitImages["femenino"]
+  const src = identityMap[outfit] ?? identityMap[0]
 
   return (
     <div className={`relative ${className}`}>
@@ -81,7 +85,7 @@ export function CharacterAvatar({ parts, energyColor, size = 200, className = ""
       >
         <Image
           src={src}
-          alt="Avatar"
+          alt={`Avatar ${identity}`}
           width={size}
           height={size * 1.5}
           className="h-full w-full object-contain drop-shadow-lg"
