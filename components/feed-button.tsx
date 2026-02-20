@@ -109,20 +109,20 @@ export function FeedButton({ petName, onFeed, hungerValue }: Props) {
         className="group w-full rounded-xl px-4 py-3 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:hover:scale-100"
         style={{
           background: isDisabled
-            ? "rgba(200,220,240,0.5)"
-            : "linear-gradient(180deg, rgba(255,255,255,0.7), rgba(240,255,240,0.5))",
-          border: `1px solid ${hungerFull ? "rgba(200,220,255,0.3)" : "rgba(76,175,80,0.3)"}`,
-          boxShadow: isDisabled ? "none" : "0 2px 8px rgba(76,175,80,0.1)",
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(76,175,80,0.15)",
+          border: `1px solid ${hungerFull ? "rgba(255,255,255,0.1)" : "rgba(76,175,80,0.3)"}`,
+          boxShadow: isDisabled ? "none" : "0 2px 8px rgba(76,175,80,0.15)",
         }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg transition-transform duration-200 group-hover:scale-110">🍎</span>
             <div className="text-left">
-              <span className="block text-[11px] font-bold tracking-wider text-primary">
+              <span className="block text-[11px] font-bold tracking-wider text-white/80">
                 Alimentar
               </span>
-              <span className="block text-[9px] font-semibold tracking-wider text-primary/40">
+              <span className="block text-[9px] font-semibold tracking-wider text-white/40">
                 {FEED_COST} 🍊 $FRUTA
               </span>
             </div>
@@ -131,17 +131,17 @@ export function FeedButton({ petName, onFeed, hungerValue }: Props) {
           {/* Status indicator */}
           <div className="text-right">
             {hungerFull && (
-              <span className="text-[9px] font-semibold tracking-wider text-primary/40">
+              <span className="text-[9px] font-semibold tracking-wider text-white/40">
                 Satisfecho ✨
               </span>
             )}
             {!authenticated && (
-              <span className="text-[9px] font-semibold tracking-wider text-primary/40">
+              <span className="text-[9px] font-semibold tracking-wider text-white/40">
                 Requiere login
               </span>
             )}
             {authenticated && !hungerFull && !canAfford && (
-              <span className="text-[9px] font-semibold tracking-wider" style={{ color: "#ff5722" }}>
+              <span className="text-[9px] font-semibold tracking-wider" style={{ color: "#ff8a65" }}>
                 Sin fondos
               </span>
             )}

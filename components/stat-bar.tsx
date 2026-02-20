@@ -13,18 +13,18 @@ export function StatBar({ label, value, max, barColor }: StatBarProps) {
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-primary">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/70">
           {label}
         </span>
-        <span className="text-[10px] font-bold text-primary/70">
+        <span className="text-[10px] font-bold text-white/50">
           {value}/{max}
         </span>
       </div>
       <div
         className="relative h-3 w-full overflow-hidden rounded-full"
         style={{
-          background: "rgba(200,220,240,0.4)",
-          boxShadow: "inset 0 1px 3px rgba(0,50,100,0.08)",
+          background: "rgba(255,255,255,0.1)",
+          boxShadow: "inset 0 1px 3px rgba(0,0,0,0.2)",
         }}
       >
         <div

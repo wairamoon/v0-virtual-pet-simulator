@@ -236,11 +236,11 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
 
       {/* Section title */}
       <div className="mb-3 flex items-center gap-2">
-        <div className="h-px flex-1" style={{ background: "rgba(0,80,200,0.1)" }} />
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-primary/50">
+        <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.1)" }} />
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
           Conversa con tu PixSim
         </span>
-        <div className="h-px flex-1" style={{ background: "rgba(0,80,200,0.1)" }} />
+        <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.1)" }} />
       </div>
 
       {/* Memory indicator */}
@@ -249,9 +249,9 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
           <span
             className="rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider"
             style={{
-              background: "rgba(156, 124, 244, 0.1)",
-              color: "rgba(156, 124, 244, 0.7)",
-              border: "1px solid rgba(156, 124, 244, 0.2)",
+              background: "rgba(156, 124, 244, 0.15)",
+              color: "rgba(156, 124, 244, 0.8)",
+              border: "1px solid rgba(156, 124, 244, 0.3)",
             }}
           >
             🧠 {memories.length} memoria{memories.length !== 1 ? "s" : ""}
@@ -263,8 +263,8 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
       <div
         className="overflow-hidden rounded-xl"
         style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.5), rgba(230,242,255,0.4))",
-          border: "1px solid rgba(200,220,255,0.4)",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.08))",
+          border: "1px solid rgba(255,255,255,0.15)",
         }}
       >
         {/* Messages */}
@@ -275,7 +275,7 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
         >
           {messages.length === 0 && !typing && (
             <div className="flex h-full items-center justify-center">
-              <p className="text-center text-[10px] tracking-wider text-primary/30">
+              <p className="text-center text-[10px] tracking-wider text-white/30">
                 Escribe algo para hablar con {petName} ✨
               </p>
             </div>
@@ -291,21 +291,21 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
                 style={
                   msg.role === "user"
                     ? {
-                        background: "linear-gradient(135deg, rgba(74, 158, 255, 0.15), rgba(0, 100, 255, 0.1))",
-                        border: "1px solid rgba(74, 158, 255, 0.2)",
+                        background: "linear-gradient(135deg, rgba(74, 158, 255, 0.2), rgba(0, 100, 255, 0.15))",
+                        border: "1px solid rgba(74, 158, 255, 0.3)",
                       }
                     : {
-                        background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,248,255,0.5))",
-                        border: "1px solid rgba(200,220,255,0.4)",
+                        background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
+                        border: "1px solid rgba(255,255,255,0.15)",
                       }
                 }
               >
                 {msg.role === "assistant" && (
-                  <span className="mb-0.5 block text-[8px] font-semibold uppercase tracking-widest text-primary/40">
+                  <span className="mb-0.5 block text-[8px] font-semibold uppercase tracking-widest text-white/40">
                     {petName}
                   </span>
                 )}
-                <p className="text-[11px] leading-relaxed text-primary/80">{msg.content}</p>
+                <p className="text-[11px] leading-relaxed text-white/80">{msg.content}</p>
               </div>
             </div>
           ))}
@@ -316,14 +316,14 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
               <div
                 className="rounded-xl px-3 py-2"
                 style={{
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(240,248,255,0.5))",
-                  border: "1px solid rgba(200,220,255,0.4)",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
+                  border: "1px solid rgba(255,255,255,0.15)",
                 }}
               >
-                <span className="text-[8px] font-semibold uppercase tracking-widest text-primary/40">
+                <span className="text-[8px] font-semibold uppercase tracking-widest text-white/40">
                   {petName}
                 </span>
-                <p className="mt-0.5 text-[9px] italic tracking-wider text-primary/30">
+                <p className="mt-0.5 text-[9px] italic tracking-wider text-white/30">
                   Escribiendo...
                 </p>
                 <div className="mt-1 flex gap-1">
@@ -337,7 +337,7 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
         </div>
 
         {/* Input */}
-        <div className="flex gap-2 p-3" style={{ borderTop: "1px solid rgba(200,220,255,0.3)" }}>
+        <div className="flex gap-2 p-3" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
           <input
             ref={inputRef}
             type="text"
@@ -348,15 +348,15 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
             disabled={loading}
             className="flex-1 rounded-lg px-3 py-2 text-[11px] text-primary outline-none transition-all disabled:opacity-50"
             style={{
-              background: "rgba(255,255,255,0.7)",
-              border: "1px solid rgba(200,220,255,0.5)",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)",
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = "rgba(0,100,255,0.3)"
-              e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,100,255,0.06)"
+              e.currentTarget.style.borderColor = "rgba(100,180,255,0.4)"
+              e.currentTarget.style.boxShadow = "0 0 0 2px rgba(100,180,255,0.1)"
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = "rgba(200,220,255,0.5)"
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"
               e.currentTarget.style.boxShadow = "none"
             }}
           />
@@ -367,7 +367,7 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
             className="rounded-lg px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white transition-all disabled:opacity-40"
             style={{
               background: loading ? "rgba(150,180,210,0.5)" : "linear-gradient(180deg, #4a9eff, #0066ff)",
-              boxShadow: loading ? "none" : "0 2px 8px rgba(0,100,255,0.25)",
+              boxShadow: loading ? "none" : "0 2px 8px rgba(0,100,255,0.3)",
             }}
           >
             Enviar
