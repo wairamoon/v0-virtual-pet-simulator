@@ -5,12 +5,35 @@ import type { PixSimData } from "./pixsim-create"
 import { StatBar } from "./stat-bar"
 import { CharacterAvatar, defaultParts } from "./character-builder"
 import { RechargeButton } from "./recharge-button"
+import { PowerIcon } from "./power-icon"
 import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 
 const energyColor: Record<string, string> = {
+  water: "#00bcd4",
+  fire: "#ff5722",
+  earth: "#4caf50",
+  // legacy
   aqua: "#00bcd4",
   lilac: "#9c7cf4",
   sky: "#4a9eff",
+}
+
+const energyIcon: Record<string, string> = {
+  water: "water",
+  fire: "fire",
+  earth: "earth",
+  aqua: "water",
+  lilac: "water",
+  sky: "water",
+}
+
+const energyLabel: Record<string, string> = {
+  water: "Agua",
+  fire: "Fuego",
+  earth: "Tierra",
+  aqua: "Aqua",
+  lilac: "Lila",
+  sky: "Cielo",
 }
 
 const STORAGE_KEY = "pixsim-data"
@@ -136,6 +159,12 @@ export function PixSimDashboard({
               <h2 className="relative z-10 mt-3 text-balance text-center text-xl font-bold tracking-wider text-primary md:text-2xl">
                 {data.name}
               </h2>
+              <div className="relative z-10 mt-2 flex items-center gap-2">
+                <PowerIcon type={energyIcon[data.energy] ?? "water"} color={color} size={20} glow />
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color }}>
+                  Poder de {energyLabel[data.energy] ?? data.energy}
+                </span>
+              </div>
               <p className="relative z-10 mt-1 text-[10px] uppercase tracking-widest text-primary/50">
                 {data.identity === "femenino"
                   ? "Identidad Femenina"

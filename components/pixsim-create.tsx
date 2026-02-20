@@ -10,11 +10,12 @@ import {
   eyeColors,
   skinTones,
 } from "./character-builder"
+import { PowerIcon } from "./power-icon"
 
 export interface PixSimData {
   name: string
   identity: "femenino" | "masculino" | "sin-genero"
-  energy: "aqua" | "lilac" | "sky"
+  energy: "water" | "fire" | "earth"
   emotional: number
   vital: number
   hunger: number
@@ -29,9 +30,9 @@ const identityOptions = [
 ]
 
 const energyOptions = [
-  { value: "aqua" as const, label: "Aqua", cssColor: "#00bcd4" },
-  { value: "lilac" as const, label: "Lila", cssColor: "#9c7cf4" },
-  { value: "sky" as const, label: "Cielo", cssColor: "#4a9eff" },
+  { value: "water" as const, label: "Agua", cssColor: "#00bcd4", icon: "water" },
+  { value: "fire" as const, label: "Fuego", cssColor: "#ff5722", icon: "fire" },
+  { value: "earth" as const, label: "Tierra", cssColor: "#4caf50", icon: "earth" },
 ]
 
 export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => void }) {
@@ -185,10 +186,10 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
                   </div>
                 </div>
 
-                {/* Energy */}
+                {/* Power */}
                 <div className="mb-6">
                   <label className="mb-3 block text-[10px] font-semibold uppercase tracking-widest text-primary">
-                    Energia Base
+                    Poder Elemental
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {energyOptions.map((opt) => (
@@ -197,7 +198,7 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
                         type="button"
                         onClick={() => setEnergy(opt.value)}
                         aria-pressed={energy === opt.value}
-                        className="flex flex-col items-center gap-2 rounded-lg px-2 py-3 transition-all"
+                        className="flex flex-col items-center gap-2 rounded-lg px-2 py-4 transition-all"
                         style={
                           energy === opt.value
                             ? {
@@ -211,14 +212,7 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
                               }
                         }
                       >
-                        <div
-                          className="h-5 w-5 rounded-full"
-                          style={{
-                            backgroundColor: opt.cssColor,
-                            boxShadow: `0 2px 8px ${opt.cssColor}40`,
-                          }}
-                          aria-hidden="true"
-                        />
+                        <PowerIcon type={opt.icon} color={opt.cssColor} size={32} />
                         <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                           {opt.label}
                         </span>

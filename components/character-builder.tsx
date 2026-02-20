@@ -40,14 +40,16 @@ const outfitImages: Record<number, string> = {
   3: "/images/outfits/dress.webp",
 }
 
-// Map energy color to CSS hue-rotate degrees
+// Map energy color to CSS hue-rotate degrees (base images are blue-toned)
 const hueMap: Record<string, string> = {
-  "#4a9eff": "0deg",     // base blue — no rotation
-  "#9c7cf4": "270deg",   // violet
-  "#00bcd4": "160deg",   // aqua/cyan
-  "#e0457b": "320deg",   // pink
-  "#40aa40": "100deg",   // green
-  "#ff8c00": "30deg",    // amber
+  "#00bcd4": "0deg",     // water/cyan — close to base blue, minimal rotation
+  "#ff5722": "160deg",   // fire/orange-red
+  "#4caf50": "90deg",    // earth/green
+  "#4a9eff": "0deg",     // legacy blue
+  "#9c7cf4": "270deg",   // legacy violet
+  "#e0457b": "320deg",   // legacy pink
+  "#40aa40": "90deg",    // legacy green
+  "#ff8c00": "30deg",    // legacy amber
 }
 
 interface Props {
