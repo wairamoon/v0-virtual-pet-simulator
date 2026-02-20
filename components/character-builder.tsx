@@ -70,12 +70,7 @@ export function CharacterAvatar({ parts, energyColor, identity, size = 200, clas
 
   return (
     <div className={`relative ${className}`}>
-      {/* Glow aura behind avatar */}
-      <div
-        className="absolute inset-0 -z-10 scale-110 rounded-full opacity-40 blur-[30px] animate-glow-pulse"
-        style={{ backgroundColor: energyColor }}
-        aria-hidden="true"
-      />
+      {/* No aura — clean background */}
       <div
         className="relative overflow-hidden rounded-2xl"
         style={{

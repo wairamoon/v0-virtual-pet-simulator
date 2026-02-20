@@ -80,18 +80,10 @@ export function PixSimDashboard({
               <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
             </div>
 
-            {/* Elemental halo */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true">
-              <div
-                className="h-64 w-64 rounded-full opacity-25 blur-[60px]"
-                style={{ backgroundColor: color }}
-              />
-            </div>
-
-            {/* Ground reflection */}
+            {/* Ground shadow (neutral, no color) */}
             <div
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 h-8 w-48 rounded-full opacity-30 blur-[20px]"
-              style={{ backgroundColor: color }}
+              className="absolute bottom-2 left-1/2 -translate-x-1/2 h-4 w-36 rounded-full opacity-20 blur-[12px]"
+              style={{ backgroundColor: "#000" }}
               aria-hidden="true"
             />
 
