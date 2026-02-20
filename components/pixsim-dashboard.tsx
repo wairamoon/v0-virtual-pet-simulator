@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import type { PixSimData } from "./pixsim-create"
 import { StatBar } from "./stat-bar"
-import { AvatarFigure } from "./avatar-figure"
+import { CharacterAvatar, defaultParts } from "./character-builder"
 import { RechargeButton } from "./recharge-button"
 import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 
@@ -124,10 +124,11 @@ export function PixSimDashboard({
               </div>
 
               {/* Avatar */}
-              <div className="relative z-10 h-52 w-40 animate-float md:h-60 md:w-44">
-                <AvatarFigure
-                  identity={data.identity}
+              <div className="relative z-10 animate-float">
+                <CharacterAvatar
+                  parts={data.character ?? defaultParts}
                   energyColor={color}
+                  size={150}
                 />
               </div>
 
