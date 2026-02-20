@@ -261,6 +261,15 @@ export function PixSimDashboard({
               petName={data.name}
               petIdentity={data.identity}
               petPower={data.energy}
+              stats={{ emotional: data.emotional, vital: data.vital, hunger: data.hunger }}
+              onStatChange={(stat, delta) => {
+                setData((prev) => {
+                  const val = Math.max(0, Math.min(100, prev[stat] + delta))
+                  const next = { ...prev, [stat]: val }
+                  persist(next)
+                  return next
+                })
+              }}
             />
 
             {/* Separator */}
