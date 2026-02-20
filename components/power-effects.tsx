@@ -615,10 +615,404 @@ export function FirePowerEffect({ active }: { active: boolean }) {
   )
 }
 
-// ============ EARTH EFFECT (placeholder for next) ============
+// ============ EARTH PLANT DATA ============
+interface Vine {
+  id: number
+  x: number
+  height: number
+  delay: number
+  duration: number
+  lean: number
+  leaves: number
+}
+
+function generateVines(count: number): Vine[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: 5 + Math.random() * 90,
+    height: 30 + Math.random() * 50,
+    delay: Math.random() * 2.5,
+    duration: 2 + Math.random() * 2,
+    lean: -8 + Math.random() * 16,
+    leaves: 1 + Math.floor(Math.random() * 3),
+  }))
+}
+
+interface FloatingLeaf {
+  id: number
+  x: number
+  y: number
+  size: number
+  delay: number
+  duration: number
+  rotation: number
+}
+
+function generateLeaves(count: number): FloatingLeaf[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: 10 + Math.random() * 80,
+    y: 20 + Math.random() * 60,
+    size: 6 + Math.random() * 10,
+    delay: Math.random() * 4,
+    duration: 3 + Math.random() * 4,
+    rotation: Math.random() * 360,
+  }))
+}
+
+interface GrowSpore {
+  id: number
+  x: number
+  delay: number
+  duration: number
+  size: number
+}
+
+function generateSpores(count: number): GrowSpore[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: 15 + Math.random() * 70,
+    delay: Math.random() * 3,
+    duration: 2 + Math.random() * 2.5,
+    size: 2 + Math.random() * 3,
+  }))
+}
+
+// ============ EARTH EFFECT ============
 export function EarthPowerEffect({ active }: { active: boolean }) {
-  if (!active) return null
-  return null // TODO
+  const [growing, setGrowing] = useState(false)
+  const [showPlant, setShowPlant] = useState(false)
+
+  const vines = useMemo(() => generateVines(12), [])
+  const leaves = useMemo(() => generateLeaves(10), [])
+  const spores = useMemo(() => generateSpores(20), [])
+
+  useEffect(() => {
+    if (!active) {
+      setGrowing(false)
+      setShowPlant(false)
+      return
+    }
+
+    setGrowing(true)
+    setShowPlant(true)
+
+    const timer = setTimeout(() => {
+      setGrowing(false)
+    }, EFFECT_DURATION)
+
+    return () => clearTimeout(timer)
+  }, [active])
+
+  if (!active && !showPlant) return null
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes vineGrow {
+          0% {
+            clip-path: inset(100% 0 0 0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            clip-path: inset(0% 0 0 0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes leafFloat {
+          0%, 100% {
+            opacity: 0;
+            transform: translateY(0) rotate(var(--leaf-rot)) scale(0.7);
+          }
+          20% {
+            opacity: var(--leaf-opacity, 0.4);
+            transform: translateY(-5px) rotate(calc(var(--leaf-rot) + 15deg)) scale(1);
+          }
+          80% {
+            opacity: var(--leaf-opacity, 0.4);
+            transform: translateY(-12px) rotate(calc(var(--leaf-rot) - 10deg)) scale(0.95);
+          }
+        }
+
+        @keyframes sporeRise {
+          0% {
+            transform: translateY(0) scale(0.5);
+            opacity: 0;
+          }
+          20% {
+            opacity: var(--spore-opacity, 0.4);
+          }
+          80% {
+            opacity: var(--spore-opacity, 0.4);
+          }
+          100% {
+            transform: translateY(-80px) scale(0.2);
+            opacity: 0;
+          }
+        }
+
+        @keyframes plantSprout {
+          0% {
+            transform: scale(0) translateY(15px);
+            opacity: 0;
+          }
+          40% {
+            transform: scale(0.6) translateY(5px);
+            opacity: 0.8;
+          }
+          70% {
+            transform: scale(1.1) translateY(-2px);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes plantSway {
+          0%, 100% {
+            transform: rotate(0deg) translateY(0);
+          }
+          25% {
+            transform: rotate(2deg) translateY(-1px);
+          }
+          75% {
+            transform: rotate(-2deg) translateY(-2px);
+          }
+        }
+
+        @keyframes auraPulse {
+          0%, 100% {
+            opacity: 0.06;
+          }
+          50% {
+            opacity: 0.12;
+          }
+        }
+      `}</style>
+
+      {/* ===== EARTH BACKGROUND (behind avatar) ===== */}
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
+        style={{
+          zIndex: 0,
+          opacity: growing ? 1 : 0,
+          transition: "opacity 2.5s ease-out",
+        }}
+      >
+        {/* Green aura */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse 80% 60% at 50% 80%, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.05) 50%, transparent 80%)",
+            animation: "auraPulse 4s ease-in-out infinite",
+          }}
+        />
+
+        {/* Growing vines from bottom */}
+        {vines.map((vine) => (
+          <div
+            key={vine.id}
+            className="absolute bottom-0"
+            style={{
+              left: `${vine.x}%`,
+              width: "2px",
+              height: `${vine.height}%`,
+              transform: `rotate(${vine.lean}deg)`,
+              transformOrigin: "bottom center",
+              animation: `vineGrow ${vine.duration}s ease-out ${vine.delay}s both`,
+            }}
+          >
+            {/* Vine stem */}
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `linear-gradient(180deg, rgba(76, 175, 80, 0.15), rgba(56, 142, 60, 0.5))`,
+              }}
+            />
+            {/* Leaves on vine */}
+            {Array.from({ length: vine.leaves }).map((_, li) => {
+              const leafY = 20 + li * 30 + Math.random() * 15
+              const side = li % 2 === 0 ? -1 : 1
+              return (
+                <svg
+                  key={li}
+                  viewBox="0 0 20 14"
+                  width="12"
+                  height="8"
+                  className="absolute"
+                  style={{
+                    top: `${leafY}%`,
+                    left: side > 0 ? "2px" : "-12px",
+                    transform: `scaleX(${side})`,
+                    opacity: 0.6,
+                  }}
+                >
+                  <path
+                    d="M2 7 Q6 0 18 2 Q14 7 18 12 Q6 14 2 7Z"
+                    fill="rgba(76, 175, 80, 0.7)"
+                  />
+                  <path d="M3 7 Q10 5 17 3" stroke="rgba(56, 142, 60, 0.4)" strokeWidth="0.5" fill="none" />
+                </svg>
+              )
+            })}
+          </div>
+        ))}
+
+        {/* Floating leaves */}
+        {leaves.map((leaf) => (
+          <div
+            key={leaf.id}
+            className="absolute"
+            style={{
+              left: `${leaf.x}%`,
+              top: `${leaf.y}%`,
+              ["--leaf-rot" as string]: `${leaf.rotation}deg`,
+              ["--leaf-opacity" as string]: 0.35,
+              animation: `leafFloat ${leaf.duration}s ease-in-out ${leaf.delay}s infinite`,
+            }}
+          >
+            <svg viewBox="0 0 20 14" width={leaf.size * 1.4} height={leaf.size} xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M2 7 Q6 0 18 2 Q14 7 18 12 Q6 14 2 7Z"
+                fill="rgba(129, 199, 132, 0.6)"
+              />
+              <path d="M3 7 Q10 5 17 3" stroke="rgba(76, 175, 80, 0.4)" strokeWidth="0.4" fill="none" />
+            </svg>
+          </div>
+        ))}
+
+        {/* Rising spores / pollen particles */}
+        {spores.map((sp) => (
+          <div
+            key={sp.id}
+            className="absolute rounded-full"
+            style={{
+              bottom: "5%",
+              left: `${sp.x}%`,
+              width: sp.size,
+              height: sp.size,
+              background: "radial-gradient(circle, rgba(200, 230, 150, 0.8), rgba(129, 199, 132, 0.3))",
+              ["--spore-opacity" as string]: 0.45,
+              animation: `sporeRise ${sp.duration}s ease-out ${sp.delay}s infinite`,
+            }}
+          />
+        ))}
+
+        {/* Bottom earth glow */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1/5"
+          style={{
+            background: "linear-gradient(180deg, transparent, rgba(76, 175, 80, 0.06), rgba(56, 142, 60, 0.1))",
+          }}
+        />
+      </div>
+
+      {/* ===== FLOATING PLANT (on the hand) ===== */}
+      {showPlant && (
+        <div
+          className="pointer-events-none absolute"
+          style={{
+            zIndex: 20,
+            right: "14%",
+            top: "50%",
+            animation: "plantSprout 1.2s ease-out forwards",
+          }}
+        >
+          <div style={{ animation: "plantSway 4s ease-in-out infinite" }}>
+            <svg viewBox="0 0 48 64" width="30" height="40" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="stemG" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#2e7d32" />
+                  <stop offset="100%" stopColor="#4caf50" />
+                </linearGradient>
+                <linearGradient id="leafG1" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#81c784" />
+                  <stop offset="100%" stopColor="#388e3c" />
+                </linearGradient>
+                <linearGradient id="leafG2" x1="1" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#a5d6a7" />
+                  <stop offset="100%" stopColor="#4caf50" />
+                </linearGradient>
+                <radialGradient id="plantAura" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%" stopColor="rgba(76, 175, 80, 0.2)" />
+                  <stop offset="100%" stopColor="transparent" />
+                </radialGradient>
+                <filter id="pGlow">
+                  <feGaussianBlur stdDeviation="2.5" result="b" />
+                  <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+              </defs>
+
+              {/* Aura */}
+              <ellipse cx="24" cy="34" rx="20" ry="24" fill="url(#plantAura)" />
+
+              {/* Main stem */}
+              <path d="M24 58 Q24 48 22 40 Q20 34 24 26" stroke="url(#stemG)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+
+              {/* Small branch left */}
+              <path d="M22 42 Q18 38 14 36" stroke="#388e3c" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+
+              {/* Small branch right */}
+              <path d="M23 36 Q28 32 32 30" stroke="#388e3c" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+
+              {/* Main leaf (right, top) */}
+              <path d="M24 26 Q34 16 42 10 Q44 18 40 26 Q34 34 24 26Z" fill="url(#leafG1)" />
+              <path d="M26 24 Q34 18 40 13" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" fill="none" />
+              <path d="M27 26 Q33 22 38 18" stroke="#2e7d32" strokeWidth="0.4" fill="none" opacity="0.4" />
+
+              {/* Second leaf (left) */}
+              <path d="M22 34 Q12 26 6 22 Q6 30 10 36 Q16 42 22 34Z" fill="url(#leafG2)" />
+              <path d="M20 33 Q14 28 8 24" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" fill="none" />
+              <path d="M19 35 Q13 30 8 26" stroke="#2e7d32" strokeWidth="0.4" fill="none" opacity="0.35" />
+
+              {/* Third small leaf (right lower) */}
+              <path d="M26 38 Q34 34 38 30 Q36 36 32 40 Q28 42 26 38Z" fill="#81c784" opacity="0.7" />
+
+              {/* Tiny bud at top */}
+              <ellipse cx="36" cy="10" rx="2.5" ry="3" fill="#a5d6a7" />
+              <ellipse cx="36" cy="9" rx="1.5" ry="1.5" fill="#c8e6c9" opacity="0.6" />
+
+              {/* Leaf shine */}
+              <ellipse cx="34" cy="20" rx="2" ry="4" fill="white" opacity="0.15" transform="rotate(-30 34 20)" />
+
+              {/* Energy sparkles */}
+              <circle cx="18" cy="28" r="1" fill="#c8e6c9" opacity="0.5" filter="url(#pGlow)">
+                <animate attributeName="opacity" values="0.5;0.15;0.5" dur="2.5s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="38" cy="22" r="0.8" fill="#a5d6a7" opacity="0.4" filter="url(#pGlow)">
+                <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="10" cy="32" r="0.7" fill="#c8e6c9" opacity="0.3">
+                <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
+              </circle>
+
+              {/* Circuit accents (cybercore touch) */}
+              <path d="M40 28 L44 28 L44 32" stroke="rgba(129, 199, 132, 0.35)" strokeWidth="0.6" fill="none" />
+              <circle cx="44" cy="32" r="0.8" fill="rgba(129, 199, 132, 0.4)" />
+              <path d="M8 36 L4 36 L4 32" stroke="rgba(129, 199, 132, 0.35)" strokeWidth="0.6" fill="none" />
+              <circle cx="4" cy="32" r="0.8" fill="rgba(129, 199, 132, 0.4)" />
+            </svg>
+
+            {/* Ground particles below plant */}
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+              <div
+                className="h-2 w-10 rounded-full"
+                style={{
+                  background: "radial-gradient(ellipse, rgba(76, 175, 80, 0.2), transparent)",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
 
 // ============ WRAPPER ============
