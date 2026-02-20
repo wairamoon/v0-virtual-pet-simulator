@@ -330,7 +330,7 @@ export function PixSimDashboard({
                 Reiniciar experiencia
               </h3>
               <p className="mb-6 text-center text-[11px] leading-relaxed text-primary/50">
-                {'Esto eliminara tu PixSim actual y todos sus datos. Esta accion no se puede deshacer.'}
+                {'Esto eliminará tu PixSim actual, sus stats y el historial de chat. Las memorias de tu PixSim se conservarán.'}
               </p>
               <div className="flex gap-3">
                 <button

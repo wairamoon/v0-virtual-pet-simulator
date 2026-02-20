@@ -24,6 +24,8 @@ function saveData(data: PixSimData) {
 
 function clearData() {
   localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem("pixsim-chat")
+  // Note: "pixsim-memories" is intentionally kept so the new PixSim can remember learned facts
 }
 
 export default function PixSimApp() {
