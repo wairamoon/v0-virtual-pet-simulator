@@ -11,6 +11,7 @@ import {
   skinTones,
 } from "./character-builder"
 import { PowerIcon } from "./power-icon"
+import { PowerEffect } from "./power-effects"
 
 export interface PixSimData {
   name: string
@@ -267,13 +268,16 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
                   </h2>
                 </div>
 
-                {/* Avatar preview */}
-                <div className="mb-5 flex justify-center rounded-xl p-4" style={{ background: "rgba(255,255,255,0.4)" }}>
-                  <CharacterAvatar
-                    parts={character}
-                    energyColor={selectedEnergyColor}
-                    size={140}
-                  />
+                {/* Avatar preview with power effect */}
+                <div className="relative mb-5 flex justify-center rounded-xl p-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.4)" }}>
+                  <PowerEffect power={energy ?? ""} active={!!energy} />
+                  <div className="relative z-10">
+                    <CharacterAvatar
+                      parts={character}
+                      energyColor={selectedEnergyColor}
+                      size={140}
+                    />
+                  </div>
                 </div>
 
                 {/* Hair style */}

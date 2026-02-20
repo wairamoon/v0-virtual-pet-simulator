@@ -6,6 +6,7 @@ import { StatBar } from "./stat-bar"
 import { CharacterAvatar, defaultParts } from "./character-builder"
 import { RechargeButton } from "./recharge-button"
 import { PowerIcon } from "./power-icon"
+import { PowerEffect } from "./power-effects"
 import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 
 const energyColor: Record<string, string> = {
@@ -124,9 +125,10 @@ export function PixSimDashboard({
 
           <div className="p-6 md:p-8">
             {/* Character area */}
-            <div className="relative mb-6 flex flex-col items-center justify-center rounded-xl p-6"
+            <div className="relative mb-6 flex flex-col items-center justify-center rounded-xl p-6 overflow-hidden"
               style={{ background: "rgba(255,255,255,0.4)" }}
             >
+              <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
               {/* Halo circle */}
               <div
                 className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2"
