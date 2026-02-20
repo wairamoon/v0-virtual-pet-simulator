@@ -1,6 +1,9 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { usePrivy } from "@privy-io/react-auth"
+import { tryEarnCoins } from "@/lib/coins"
+import { emitCoinChange } from "./user-header"
 
 interface ChatMessage {
   role: "user" | "assistant"
@@ -58,6 +61,7 @@ interface Props {
 }
 
 export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange }: Props) {
+  const { authenticated, user } = usePrivy()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [memories, setMemories] = useState<PetMemory[]>([])
   const [input, setInput] = useState("")
@@ -163,6 +167,14 @@ export function PixSimChat({ petName, petIdentity, petPower, stats, onStatChange
       const withReply = [...updated, botMsg]
       setMessages(withReply)
       saveMessages(withReply)
+
+      // Try to earn coins (only if logged in)
+      if (authenticated && user) {
+        const earned = tryEarnCoins(user.id)
+        if (earned > 0) {
+          emitCoinChange(earned)
+        }
+      }
 
       // Process new memories from API
       if (data.newMemories && Array.isArray(data.newMemories) && data.newMemories.length > 0) {

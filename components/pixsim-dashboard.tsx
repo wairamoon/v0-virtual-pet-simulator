@@ -9,6 +9,7 @@ import { PowerIcon } from "./power-icon"
 import { PowerEffect } from "./power-effects"
 import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 import { PixSimChat } from "./pixsim-chat"
+import { FeedButton } from "./feed-button"
 
 const energyColor: Record<string, string> = {
   water: "#00bcd4",
@@ -251,6 +252,21 @@ export function PixSimDashboard({
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Feed button */}
+            <div className="mt-5">
+              <FeedButton
+                petName={data.name}
+                onFeed={() => {
+                  setData((prev) => {
+                    const next = { ...prev, hunger: Math.min(100, prev.hunger + 15) }
+                    persist(next)
+                    return next
+                  })
+                }}
+                hungerValue={data.hunger}
+              />
             </div>
 
             {/* Separator */}
