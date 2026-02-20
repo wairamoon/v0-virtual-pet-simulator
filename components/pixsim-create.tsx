@@ -50,7 +50,7 @@ export function PixSimCreate({ onCreate }: { onCreate: (data: PixSimData) => voi
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-start justify-center p-4 py-8 sm:items-center">
       <div className="relative w-full max-w-md animate-fade-in">
         {/* Glossy aero card */}
         <div

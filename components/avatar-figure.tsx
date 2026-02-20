@@ -9,9 +9,9 @@ interface AvatarFigureProps {
 }
 
 const avatarMap: Record<string, string> = {
-  femenino: "/images/avatar-femenino.jpg",
-  masculino: "/images/avatar-masculino.jpg",
-  "sin-genero": "/images/avatar-neutro.jpg",
+  femenino: "/images/avatar-femenino.png",
+  masculino: "/images/avatar-masculino.png",
+  "sin-genero": "/images/avatar-neutro.png",
 }
 
 export function AvatarFigure({ identity, energyColor, className = "" }: AvatarFigureProps) {
