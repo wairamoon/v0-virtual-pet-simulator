@@ -8,6 +8,7 @@ import { RechargeButton } from "./recharge-button"
 import { PowerIcon } from "./power-icon"
 import { PowerEffect } from "./power-effects"
 import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
+import { PixSimChat } from "./pixsim-chat"
 
 const energyColor: Record<string, string> = {
   water: "#00bcd4",
@@ -251,6 +252,16 @@ export function PixSimDashboard({
                 </div>
               </div>
             </div>
+
+            {/* Separator */}
+            <div className="mt-5 h-px" style={{ background: "rgba(0,80,200,0.1)" }} />
+
+            {/* Chat */}
+            <PixSimChat
+              petName={data.name}
+              petIdentity={data.identity}
+              petPower={data.energy}
+            />
 
             {/* Separator */}
             <div className="mt-5 h-px" style={{ background: "rgba(0,80,200,0.1)" }} />
