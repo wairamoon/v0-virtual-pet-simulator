@@ -77,7 +77,6 @@ export function CharacterAvatar({ parts, energyColor, size = 200, className = ""
         style={{
           width: size,
           height: size * 1.5,
-          filter: hue !== "0deg" ? `hue-rotate(${hue})` : undefined,
         }}
       >
         <Image
