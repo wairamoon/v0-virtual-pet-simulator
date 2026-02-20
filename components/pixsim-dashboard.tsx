@@ -39,7 +39,7 @@ export function PixSimDashboard({
   const [data, setData] = useState(initialData)
   const [showModal, setShowModal] = useState(false)
   const [showChat, setShowChat] = useState(false)
-  const [viewAngle, setViewAngle] = useState(0) // 0=front, 1=right, 2=back, 3=left (cosmetic)
+  const [rotating, setRotating] = useState(false)
 
   const color = energyColor[data.energy] ?? energyColor.sky
 
@@ -58,6 +58,19 @@ export function PixSimDashboard({
     }, 60000)
     return () => clearInterval(interval)
   }, [])
+
+  const rotateOutfit = useCallback((dir: 1 | -1) => {
+    if (rotating) return
+    setRotating(true)
+    setData((prev) => {
+      const current = prev.character?.outfit ?? 0
+      const next = ((current + dir + 4) % 4) as 0 | 1 | 2 | 3
+      const updated = { ...prev, character: { ...(prev.character ?? defaultParts), outfit: next } }
+      persist(updated)
+      return updated
+    })
+    setTimeout(() => setRotating(false), 400)
+  }, [rotating])
 
   const recharge = useCallback((stat: "emotional" | "vital" | "hunger") => {
     setData((prev) => {
@@ -89,10 +102,7 @@ export function PixSimDashboard({
 
             {/* Avatar — large */}
             <div
-              className="relative z-10 animate-float transition-transform duration-500"
-              style={{
-                transform: `scaleX(${viewAngle === 1 ? -1 : viewAngle === 3 ? -1 : 1})`,
-              }}
+              className={`relative z-10 animate-float transition-all duration-400 ${rotating ? "scale-95 opacity-80" : "scale-100 opacity-100"}`}
             >
               <CharacterAvatar
                 parts={data.character ?? defaultParts}
@@ -107,7 +117,7 @@ export function PixSimDashboard({
           <div className="mt-2 flex items-center gap-8">
             <button
               type="button"
-              onClick={() => setViewAngle((v) => (v + 3) % 4)}
+              onClick={() => rotateOutfit(-1)}
               className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
               style={{
                 background: "rgba(255,255,255,0.15)",
@@ -128,7 +138,7 @@ export function PixSimDashboard({
 
             <button
               type="button"
-              onClick={() => setViewAngle((v) => (v + 1) % 4)}
+              onClick={() => rotateOutfit(1)}
               className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
               style={{
                 background: "rgba(255,255,255,0.15)",
