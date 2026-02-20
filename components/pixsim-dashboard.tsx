@@ -130,7 +130,7 @@ export function PixSimDashboard({
             </button>
 
             {/* Outfit label */}
-            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/50">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/50">
               {outfitLabels[data.character?.outfit ?? 0]}
             </span>
 
@@ -170,34 +170,34 @@ export function PixSimDashboard({
           <div
             className="overflow-hidden rounded-2xl shadow-xl"
             style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid rgba(220,230,240,0.8)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
             }}
           >
             {/* Panel header */}
             <div
               className="flex items-center justify-between px-5 py-3"
               style={{
-                background: "rgba(255,255,255,0.08)",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                background: "rgba(200,225,255,0.3)",
+                borderBottom: "1px solid rgba(200,220,240,0.5)",
               }}
             >
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
                   <div className="h-2 w-2 rounded-full" style={{ background: `${color}cc` }} />
-                  <div className="h-2 w-2 rounded-full bg-white/20" />
-                  <div className="h-2 w-2 rounded-full bg-white/20" />
+                  <div className="h-2 w-2 rounded-full bg-primary/10" />
+                  <div className="h-2 w-2 rounded-full bg-primary/10" />
                 </div>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/60">
                   Estado
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowModal(true)}
-                className="rounded-md px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white/40 transition-all hover:text-red-400 hover:bg-red-400/10"
+                className="rounded-md px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-primary/40 transition-all hover:text-red-400 hover:bg-red-50"
               >
                 Reiniciar
               </button>
@@ -206,7 +206,7 @@ export function PixSimDashboard({
             <div className="p-5 flex flex-col gap-5">
               {/* Name + identity (desktop) */}
               <div className="hidden lg:block">
-                <h2 className="text-xl font-bold tracking-wider text-white">
+                <h2 className="text-xl font-bold tracking-wider text-primary">
                   {data.name}
                 </h2>
                 <div className="mt-1 flex items-center gap-2">
@@ -215,13 +215,13 @@ export function PixSimDashboard({
                     Poder de {energyLabel[data.energy] ?? data.energy}
                   </span>
                 </div>
-                <p className="mt-0.5 text-[9px] uppercase tracking-widest text-white/30">
+                <p className="mt-0.5 text-[9px] uppercase tracking-widest text-primary/30">
                   {data.identity === "femenino" ? "Identidad Femenina" : data.identity === "masculino" ? "Identidad Masculina" : "Sin Género"}
                 </p>
               </div>
 
               {/* Separator */}
-              <div className="hidden lg:block h-px bg-white/10" />
+              <div className="hidden lg:block h-px bg-gray-200" />
 
               {/* Stats */}
               <div className="flex flex-col gap-4">
@@ -260,7 +260,7 @@ export function PixSimDashboard({
               </div>
 
               {/* Separator */}
-              <div className="h-px bg-white/10" />
+              <div className="h-px bg-gray-200" />
 
               {/* Feed button */}
               <FeedButton
@@ -279,17 +279,17 @@ export function PixSimDashboard({
               <button
                 type="button"
                 onClick={() => setShowChat(!showChat)}
-                className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-white/80 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{
-                  background: showChat ? "rgba(255,255,255,0.15)" : `${color}30`,
-                  border: `1px solid ${showChat ? "rgba(255,255,255,0.2)" : `${color}40`}`,
+                  background: showChat ? "rgba(200,220,240,0.3)" : `${color}20`,
+                  border: `1px solid ${showChat ? "rgba(200,220,240,0.5)" : `${color}40`}`,
                 }}
               >
                 {showChat ? "✕ Cerrar Chat" : `💬 Hablar con ${data.name}`}
               </button>
 
               {/* Creation date */}
-              <p className="text-center text-[8px] uppercase tracking-widest text-white/25">
+              <p className="text-center text-[8px] uppercase tracking-widest text-primary/30">
                 Creado el{" "}
                 {new Date(data.createdAt).toLocaleDateString("es-ES", {
                   day: "numeric", month: "long", year: "numeric",
@@ -306,10 +306,10 @@ export function PixSimDashboard({
           <div
             className="mx-auto max-w-3xl overflow-hidden rounded-2xl shadow-xl"
             style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid rgba(220,230,240,0.8)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
             }}
           >
             <div className="p-4">
@@ -359,17 +359,17 @@ export function PixSimDashboard({
               </span>
             </div>
             <div className="p-6">
-              <h3 id="reset-title" className="mb-2 text-center text-sm font-bold tracking-wider text-white">
+              <h3 id="reset-title" className="mb-2 text-center text-sm font-bold tracking-wider text-primary">
                 Reiniciar experiencia
               </h3>
-              <p className="mb-6 text-center text-[11px] leading-relaxed text-white/50">
+              <p className="mb-6 text-center text-[11px] leading-relaxed text-primary/50">
                 Esto eliminará tu PixSim actual, sus stats y el historial de chat. Las memorias se conservarán.
               </p>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 rounded-lg py-2.5 text-[10px] font-semibold uppercase tracking-wider text-white/60 transition-all hover:bg-white/10"
+                  className="flex-1 rounded-lg py-2.5 text-[10px] font-semibold uppercase tracking-wider text-primary/60 transition-all hover:bg-gray-100"
                   style={{ border: "1px solid rgba(255,255,255,0.2)" }}
                 >
                   Cancelar
