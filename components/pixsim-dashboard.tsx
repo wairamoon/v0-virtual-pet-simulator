@@ -11,6 +11,7 @@ import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 import { PixSimChat } from "./pixsim-chat"
 import { FeedButton } from "./feed-button"
 import { CreativeLab } from "./creative-lab"
+import { EvolutionOverlay, LevelBadge, getEvolutionLevel } from "./evolution-overlay"
 
 const energyColor: Record<string, string> = {
   water: "#00bcd4", fire: "#ff5722", earth: "#4caf50",
@@ -102,7 +103,7 @@ export function PixSimDashboard({
               aria-hidden="true"
             />
 
-            {/* Avatar — large */}
+            {/* Avatar — large + evolution overlay */}
             <div
               className={`relative z-10 animate-float transition-all duration-400 ${rotating ? "scale-95 opacity-80" : "scale-100 opacity-100"}`}
             >
@@ -111,6 +112,11 @@ export function PixSimDashboard({
                 energyColor={color}
                 identity={data.identity}
                 size={260}
+              />
+              <EvolutionOverlay
+                level={getEvolutionLevel(data.creativeXP ?? 0).level}
+                size={260}
+                color={getEvolutionLevel(data.creativeXP ?? 0).color}
               />
             </div>
           </div>
@@ -305,30 +311,29 @@ export function PixSimDashboard({
                 {showLab ? "✕ Cerrar Lab" : "🧪 Laboratorio Creativo"}
               </button>
 
-              {/* Creative XP display */}
+              {/* Evolution Level + Creative Stats */}
               {(data.creativeXP ?? 0) > 0 && (
-                <div
-                  className="flex items-center justify-between rounded-xl px-4 py-2.5"
-                  style={{ background: "rgba(156,124,244,0.08)", border: "1px solid rgba(156,124,244,0.15)" }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🧪</span>
-                    <span className="text-[9px] font-semibold uppercase tracking-wider text-[#9c7cf4]">XP Creativo</span>
+                <>
+                  <LevelBadge xp={data.creativeXP ?? 0} />
+                  <div className="flex gap-2">
+                    <div
+                      className="flex-1 flex items-center justify-between rounded-xl px-3 py-2"
+                      style={{ background: "rgba(156,124,244,0.08)", border: "1px solid rgba(156,124,244,0.15)" }}
+                    >
+                      <span className="text-[8px] font-semibold uppercase tracking-wider text-[#9c7cf4]">🧪 XP</span>
+                      <span className="text-xs font-bold text-[#9c7cf4]">{data.creativeXP ?? 0}</span>
+                    </div>
+                    {(data.creativeCoins ?? 0) > 0 && (
+                      <div
+                        className="flex-1 flex items-center justify-between rounded-xl px-3 py-2"
+                        style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.15)" }}
+                      >
+                        <span className="text-[8px] font-semibold uppercase tracking-wider text-[#d4a800]">🪙</span>
+                        <span className="text-xs font-bold text-[#d4a800]">{data.creativeCoins ?? 0}</span>
+                      </div>
+                    )}
                   </div>
-                  <span className="text-sm font-bold text-[#9c7cf4]">{data.creativeXP ?? 0}</span>
-                </div>
-              )}
-              {(data.creativeCoins ?? 0) > 0 && (
-                <div
-                  className="flex items-center justify-between rounded-xl px-4 py-2.5"
-                  style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.15)" }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🪙</span>
-                    <span className="text-[9px] font-semibold uppercase tracking-wider text-[#d4a800]">Monedas Creativas</span>
-                  </div>
-                  <span className="text-sm font-bold text-[#d4a800]">{data.creativeCoins ?? 0}</span>
-                </div>
+                </>
               )}
 
               {/* Creation date */}
