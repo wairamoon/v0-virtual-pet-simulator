@@ -70,6 +70,11 @@ function createThumbnail(dataUrl: string, maxW = 120): Promise<string> {
   })
 }
 
+interface ChatMessage {
+  role: "user" | "assistant"
+  content: string
+}
+
 interface CreativeLabProps {
   petName: string
   accentColor: string
@@ -77,6 +82,9 @@ interface CreativeLabProps {
   creativeXP: number
   creativeCoins: number
   onReward: (xp: number, coins: number) => void
+  petIdentity: string
+  petPower: string
+  stats: { emotional: number; vital: number; hunger: number }
 }
 
 function ScoreRing({ value, label, icon, color }: { value: number; label: string; icon: string; color: string }) {
@@ -137,7 +145,7 @@ function TotalScoreBadge({ score, color }: { score: number; color: string }) {
   )
 }
 
-export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativeCoins, onReward }: CreativeLabProps) {
+export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativeCoins, onReward, petIdentity, petPower, stats }: CreativeLabProps) {
   const [image, setImage] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -149,11 +157,46 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
   const [history, setHistory] = useState<LabHistoryEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [chatInput, setChatInput] = useState("")
+  const [chatLoading, setChatLoading] = useState(false)
+  const [showLabChat, setShowLabChat] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setHistory(loadHistory())
   }, [])
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [chatMessages])
+
+  async function handleChatSend() {
+    if (!chatInput.trim() || chatLoading) return
+    const userMsg: ChatMessage = { role: "user", content: chatInput.trim() }
+    setChatMessages(prev => [...prev, userMsg])
+    setChatInput("")
+    setChatLoading(true)
+    try {
+      const res = await fetch("/api/lab-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMsg.content,
+          petName,
+          evaluation: evaluation || null,
+          history: chatMessages,
+        }),
+      })
+      const data = await res.json()
+      setChatMessages(prev => [...prev, { role: "assistant", content: data.reply }])
+    } catch {
+      setChatMessages(prev => [...prev, { role: "assistant", content: "Error de conexión... 🔧" }])
+    } finally {
+      setChatLoading(false)
+    }
+  }
 
   function handleFile(file: File) {
     if (!file.type.startsWith("image/")) return
@@ -604,6 +647,103 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
             <p className="text-center text-[8px] text-primary/25 uppercase tracking-widest">
               Sube una imagen para activar la evaluación
             </p>
+          )}
+
+          {/* Lab Chat toggle */}
+          <button
+            type="button"
+            onClick={() => setShowLabChat(!showLabChat)}
+            className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: showLabChat ? "rgba(200,220,240,0.3)" : `${accentColor}15`,
+              border: `1px solid ${showLabChat ? "rgba(200,220,240,0.5)" : `${accentColor}30`}`,
+            }}
+          >
+            {showLabChat ? "✕ Cerrar Chat del Lab" : `💬 Hablar con ${petName} sobre tu diseño`}
+          </button>
+
+          {/* Lab Chat Panel */}
+          {showLabChat && (
+            <div
+              className="rounded-2xl overflow-hidden animate-fade-in"
+              style={{
+                background: "rgba(200,225,255,0.15)",
+                border: "1px solid rgba(200,220,240,0.4)",
+              }}
+            >
+              {/* Chat header */}
+              <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderBottom: "1px solid rgba(200,220,240,0.3)" }}>
+                <div className="h-2 w-2 rounded-full animate-pulse" style={{ background: accentColor }} />
+                <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/60">
+                  Chat del Laboratorio
+                </span>
+              </div>
+
+              {/* Messages */}
+              <div className="h-48 overflow-y-auto p-3 flex flex-col gap-2" style={{ scrollbarWidth: "thin" }}>
+                {chatMessages.length === 0 && (
+                  <p className="text-center text-[9px] text-primary/30 py-6">
+                    Pregúntale a {petName} sobre diseño, moda futurista o cómo mejorar tus creaciones 🧪
+                  </p>
+                )}
+                {chatMessages.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`max-w-[85%] rounded-xl px-3 py-2 text-[11px] leading-relaxed ${
+                      msg.role === "user" ? "ml-auto" : "mr-auto"
+                    }`}
+                    style={{
+                      background: msg.role === "user"
+                        ? `${accentColor}20`
+                        : "rgba(255,255,255,0.6)",
+                      border: `1px solid ${msg.role === "user" ? `${accentColor}30` : "rgba(200,220,240,0.4)"}`,
+                      color: msg.role === "user" ? accentColor : "rgba(0,0,0,0.6)",
+                    }}
+                  >
+                    {msg.role === "assistant" && (
+                      <p className="text-[8px] font-bold uppercase tracking-wider mb-1" style={{ color: accentColor }}>
+                        {petName}
+                      </p>
+                    )}
+                    {msg.content}
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="mr-auto rounded-xl px-3 py-2 text-[11px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(200,220,240,0.4)" }}>
+                    <span className="animate-pulse" style={{ color: accentColor }}>pensando...</span>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="flex gap-2 p-3" style={{ borderTop: "1px solid rgba(200,220,240,0.3)" }}>
+                <input
+                  type="text"
+                  className="flex-1 rounded-xl px-3 py-2 text-[11px] outline-none transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.5)",
+                    border: "1px solid rgba(200,220,240,0.4)",
+                    color: "rgba(0,0,0,0.7)",
+                  }}
+                  placeholder={`Escribe a ${petName}...`}
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleChatSend()}
+                  maxLength={300}
+                  disabled={chatLoading}
+                />
+                <button
+                  type="button"
+                  onClick={handleChatSend}
+                  disabled={!chatInput.trim() || chatLoading}
+                  className="rounded-xl px-4 py-2 text-[9px] font-bold uppercase tracking-wider text-white transition-all hover:scale-105 disabled:opacity-30 disabled:hover:scale-100"
+                  style={{ background: accentColor }}
+                >
+                  Enviar
+                </button>
+              </div>
+            </div>
           )}
           </>
           )}

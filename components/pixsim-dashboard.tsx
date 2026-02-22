@@ -396,11 +396,18 @@ export function PixSimDashboard({
                     ...prev,
                     creativeXP: (prev.creativeXP ?? 0) + xp,
                     creativeCoins: (prev.creativeCoins ?? 0) + coins,
+                    // Recargar stats con las recompensas
+                    emotional: Math.min(100, prev.emotional + Math.round(xp * 0.3)),
+                    vital: Math.min(100, prev.vital + Math.round(xp * 0.2)),
+                    hunger: Math.min(100, prev.hunger + Math.round(coins * 0.5)),
                   }
                   persist(next)
                   return next
                 })
               }}
+              petIdentity={data.identity}
+              petPower={data.energy}
+              stats={{ emotional: data.emotional, vital: data.vital, hunger: data.hunger }}
             />
           </div>
         </div>
