@@ -302,11 +302,6 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
         // Trigger reward animation after a short delay
         setTimeout(() => {
           setRewardAnimation(reward)
-          // Auto-claim after animation
-          setTimeout(() => {
-            onReward(reward.xp, reward.coins)
-            setRewardClaimed(true)
-          }, 2000)
         }, 800)
       } else {
         setError(data.error || "Error en la evaluación")
@@ -701,8 +696,15 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
               }}
             >
               {!rewardClaimed ? (
-                /* Animated reward reveal */
-                <div className="flex flex-col items-center gap-3">
+                /* Clickable reward claim button */
+                <button
+                  type="button"
+                  onClick={() => {
+                    onReward(rewardAnimation.xp, rewardAnimation.coins)
+                    setRewardClaimed(true)
+                  }}
+                  className="w-full flex flex-col items-center gap-3 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
                   <div className="text-4xl" style={{ animation: "bounce 0.6s ease-in-out infinite" }}>
                     {rewardAnimation.emoji}
                   </div>
@@ -712,27 +714,36 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-2xl font-bold text-[#9c7cf4]">+{rewardAnimation.xp}</span>
-                      <span className="text-[8px] font-semibold uppercase tracking-wider text-[#9c7cf4]/60">XP Creativo</span>
+                      <span className="text-[8px] font-semibold uppercase tracking-wider text-[#9c7cf4]/60">XP → Energía Vital</span>
                     </div>
                     {rewardAnimation.coins > 0 && (
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-2xl font-bold text-[#d4a800]">+{rewardAnimation.coins}</span>
-                        <span className="text-[8px] font-semibold uppercase tracking-wider text-[#d4a800]/60">Monedas</span>
+                        <span className="text-[8px] font-semibold uppercase tracking-wider text-[#d4a800]/60">Monedas → Comida</span>
                       </div>
                     )}
+                  </div>
+                  <div
+                    className="mt-2 rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                    style={{ background: `linear-gradient(135deg, ${accentColor}dd, ${accentColor})`, boxShadow: `0 4px 15px ${accentColor}40` }}
+                  >
+                    🎁 Toca para Reclamar
                   </div>
                   <div className="flex gap-1 mt-1">
                     {["✦", "✧", "✦", "✧", "✦"].map((s, i) => (
                       <span key={i} className="text-xs" style={{ color: accentColor, opacity: 0.4 + (i % 2) * 0.3, animation: `pulse ${1 + i * 0.2}s ease-in-out infinite` }}>{s}</span>
                     ))}
                   </div>
-                </div>
+                </button>
               ) : (
                 /* Claimed confirmation */
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-2xl">✅</span>
                   <p className="text-[10px] font-semibold text-green-600">
-                    Recompensa reclamada • XP: {creativeXP} • Monedas: {creativeCoins}
+                    ¡Reclamada! Energía y comida recargadas
+                  </p>
+                  <p className="text-[8px] text-green-500">
+                    XP: {creativeXP} • Monedas: {creativeCoins}
                   </p>
                 </div>
               )}
