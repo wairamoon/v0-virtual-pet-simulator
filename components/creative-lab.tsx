@@ -145,9 +145,16 @@ function TotalScoreBadge({ score, color }: { score: number; color: string }) {
   )
 }
 
+interface GalleryImage {
+  id: string
+  dataUrl: string
+  fileName: string
+  evaluation?: EvaluationResult | null
+}
+
 export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativeCoins, onReward, petIdentity, petPower, stats }: CreativeLabProps) {
-  const [image, setImage] = useState<string | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
+  const [images, setImages] = useState<GalleryImage[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [evaluating, setEvaluating] = useState(false)
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
@@ -198,37 +205,56 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
     }
   }
 
+  const selectedImage = images.find(img => img.id === selectedId) ?? null
+  const image = selectedImage?.dataUrl ?? null
+
   function handleFile(file: File) {
     if (!file.type.startsWith("image/")) return
     if (file.size > 10 * 1024 * 1024) return
-    setFileName(file.name)
-    setEvaluation(null)
-    setError(null)
     const reader = new FileReader()
-    reader.onload = (e) => setImage(e.target?.result as string)
+    reader.onload = (e) => {
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5)
+      const newImg: GalleryImage = { id, dataUrl: e.target?.result as string, fileName: file.name }
+      setImages(prev => [...prev, newImg])
+      setSelectedId(id)
+      setEvaluation(null)
+      setError(null)
+      setRewardAnimation(null)
+      setRewardClaimed(false)
+    }
     reader.readAsDataURL(file)
   }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault()
     setDragOver(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFile(file)
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"))
+    files.forEach(f => handleFile(f))
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
+    const files = Array.from(e.target.files || [])
+    files.forEach(f => handleFile(f))
+    if (inputRef.current) inputRef.current.value = ""
   }
 
-  function handleRemove() {
-    setImage(null)
-    setFileName(null)
-    setEvaluation(null)
+  function handleRemoveImage(id: string) {
+    setImages(prev => prev.filter(img => img.id !== id))
+    if (selectedId === id) {
+      setSelectedId(images.find(img => img.id !== id)?.id ?? null)
+      setEvaluation(null)
+      setRewardAnimation(null)
+      setRewardClaimed(false)
+    }
+  }
+
+  function handleSelectImage(id: string) {
+    setSelectedId(id)
+    const img = images.find(i => i.id === id)
+    setEvaluation(img?.evaluation ?? null)
     setError(null)
     setRewardAnimation(null)
     setRewardClaimed(false)
-    if (inputRef.current) inputRef.current.value = ""
   }
 
   async function handleEvaluate() {
@@ -247,6 +273,10 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
       const data = await res.json()
       if (data.evaluation) {
         setEvaluation(data.evaluation)
+        // Save evaluation to gallery image
+        if (selectedId) {
+          setImages(prev => prev.map(img => img.id === selectedId ? { ...img, evaluation: data.evaluation } : img))
+        }
         // Save to history
         const reward = getRewardTier(data.evaluation.totalScore)
         const currentLevel = getEvolutionLevel(creativeXP)
@@ -433,57 +463,123 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
           <>
           {/* Main content: Image + Results side by side on desktop */}
           <div className="flex flex-col lg:flex-row gap-5">
-            {/* LEFT: Upload zone */}
+            {/* LEFT: Gallery + Upload */}
             <div className="flex-1 flex flex-col gap-4">
-              <div
-                className={`relative rounded-2xl border-2 border-dashed transition-all cursor-pointer ${dragOver ? "scale-[1.02]" : ""}`}
-                style={{
-                  borderColor: dragOver ? accentColor : image ? `${accentColor}60` : "rgba(200,220,240,0.6)",
-                  background: dragOver ? `${accentColor}10` : image ? "rgba(255,255,255,0.5)" : "rgba(200,225,255,0.1)",
-                  minHeight: image ? "auto" : "200px",
-                }}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
-                onClick={() => !image && inputRef.current?.click()}
-              >
-                <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleInputChange} />
-
-                {image ? (
+              {/* Selected image preview */}
+              {image && (
+                <div
+                  className="rounded-2xl overflow-hidden"
+                  style={{ border: `2px solid ${accentColor}40`, background: "rgba(255,255,255,0.5)" }}
+                >
                   <div className="p-4 flex flex-col items-center gap-3">
                     <div className="relative overflow-hidden rounded-xl shadow-lg" style={{ maxHeight: "300px" }}>
                       <img src={image} alt="Preview" className="max-w-full max-h-[300px] object-contain rounded-xl" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] text-primary/40 truncate max-w-[200px]">{fileName}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRemove() }}
-                        className="rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-red-400 transition-all hover:bg-red-50"
-                        style={{ border: "1px solid rgba(239,68,68,0.2)" }}
-                      >
-                        Quitar
-                      </button>
+                      <span className="text-[9px] text-primary/40 truncate max-w-[180px]">{selectedImage?.fileName}</span>
+                      {selectedImage?.evaluation && (
+                        <span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{ color: accentColor, background: `${accentColor}15` }}>
+                          ✓ {selectedImage.evaluation.totalScore}pts
+                        </span>
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-3 p-6">
-                    <div
-                      className="flex h-16 w-16 items-center justify-center rounded-2xl"
-                      style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}
+                </div>
+              )}
+
+              {/* Image gallery thumbnails + add button */}
+              <div className="flex flex-wrap gap-2 items-center">
+                {images.map((img) => (
+                  <div
+                    key={img.id}
+                    className="relative group cursor-pointer rounded-xl overflow-hidden transition-all hover:scale-105"
+                    style={{
+                      width: 64, height: 64,
+                      border: selectedId === img.id ? `2px solid ${accentColor}` : "2px solid rgba(200,220,240,0.4)",
+                      boxShadow: selectedId === img.id ? `0 0 10px ${accentColor}30` : "none",
+                    }}
+                    onClick={() => handleSelectImage(img.id)}
+                  >
+                    <img src={img.dataUrl} alt="" className="w-full h-full object-cover" />
+                    {img.evaluation && (
+                      <div className="absolute bottom-0 left-0 right-0 text-center text-[7px] font-bold text-white py-0.5" style={{ background: `${accentColor}cc` }}>
+                        {img.evaluation.totalScore}
+                      </div>
+                    )}
+                    {/* Remove button on hover */}
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleRemoveImage(img.id) }}
+                      className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center text-[8px] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: "rgba(239,68,68,0.8)", borderRadius: "0 0 0 6px" }}
                     >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+
+                {/* Add more button */}
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  className="flex items-center justify-center rounded-xl transition-all hover:scale-105 cursor-pointer"
+                  style={{
+                    width: 64, height: 64,
+                    border: `2px dashed ${accentColor}40`,
+                    background: `${accentColor}08`,
+                  }}
+                >
+                  <span className="text-xl" style={{ color: `${accentColor}80` }}>+</span>
+                </button>
+                <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleInputChange} />
+              </div>
+
+              {/* Drop zone (only when no images) */}
+              {images.length === 0 && (
+                <div
+                  className={`rounded-2xl border-2 border-dashed transition-all cursor-pointer ${dragOver ? "scale-[1.02]" : ""}`}
+                  style={{
+                    borderColor: dragOver ? accentColor : "rgba(200,220,240,0.6)",
+                    background: dragOver ? `${accentColor}10` : "rgba(200,225,255,0.1)",
+                    minHeight: "200px",
+                  }}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-3 p-6">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}>
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={accentColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                         <circle cx="8.5" cy="8.5" r="1.5" />
                         <polyline points="21 15 16 10 5 21" />
                       </svg>
                     </div>
-                    <p className="text-[11px] font-semibold text-primary/60">Arrastra una imagen aquí</p>
+                    <p className="text-[11px] font-semibold text-primary/60">Arrastra imágenes aquí</p>
                     <p className="text-[9px] text-primary/30">o haz clic para seleccionar</p>
                     <p className="text-[8px] text-primary/20">PNG, JPG, WEBP • Máx 10MB</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {/* Drop zone overlay when images exist */}
+              {images.length > 0 && (
+                <div
+                  className="rounded-xl transition-all"
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  style={{
+                    border: dragOver ? `2px dashed ${accentColor}` : "none",
+                    background: dragOver ? `${accentColor}10` : "transparent",
+                    padding: dragOver ? "12px" : 0,
+                    minHeight: dragOver ? "40px" : 0,
+                  }}
+                >
+                  {dragOver && <p className="text-center text-[9px]" style={{ color: accentColor }}>Suelta para agregar</p>}
+                </div>
+              )}
 
               {/* Evaluate Button */}
               <button
@@ -643,9 +739,9 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
             </div>
           )}
 
-          {!image && !evaluation && (
+          {images.length === 0 && !evaluation && (
             <p className="text-center text-[8px] text-primary/25 uppercase tracking-widest">
-              Sube una imagen para activar la evaluación
+              Sube imágenes para activar la evaluación
             </p>
           )}
 
