@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { imageBase64 } = body;
+    const { imageBase64, specialty, categoryLabel } = body;
 
     if (!imageBase64) {
       return Response.json({ error: "No image provided" }, { status: 400 });
@@ -27,13 +27,11 @@ export async function onRequestPost(context) {
         messages: [
           {
             role: "system",
-            content: `Eres un experto evaluador de moda y diseño futurista. Tu especialidad abarca:
-- Cyberpunk
-- Retro tech
-- Cybercore
-- Moda Web3
+            content: `Eres un experto evaluador de diseño futurista. Tu especialidad es: ${specialty || "moda cyberpunk, retro tech, cybercore y moda Web3"}.
 
-Evalúa la imagen que te envíen como si fueras un mentor creativo de una academia futurista. Sé profesional pero inspirador.
+Categoría de evaluación: ${categoryLabel || "Diseño General"}.
+
+Evalúa la imagen que te envíen como si fueras un mentor creativo de una academia futurista especializado en esta categoría. Sé profesional pero inspirador. Adapta tus criterios a la categoría específica.
 
 Responde ÚNICAMENTE con JSON válido (sin markdown, sin backticks):
 {

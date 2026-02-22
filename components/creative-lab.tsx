@@ -3,6 +3,14 @@
 import { useState, useRef, useEffect } from "react"
 import { getEvolutionLevel } from "./evolution-overlay"
 
+type LabCategory = "nails" | "clothing" | "content"
+
+const LAB_CATEGORIES: { value: LabCategory; label: string; icon: string; description: string; specialty: string }[] = [
+  { value: "nails", label: "Diseño de Uñas", icon: "💅", description: "Nail art futurista, cyberpunk y experimental", specialty: "nail art futurista, cyberpunk, chrome effects, 3D nail art, tech-inspired designs y tendencias Web3" },
+  { value: "clothing", label: "Diseño de Ropa", icon: "👗", description: "Moda cyberpunk, retro tech y Web3", specialty: "moda cyberpunk, retro tech, cybercore, streetwear futurista y moda Web3" },
+  { value: "content", label: "Post & Audiovisual", icon: "🎬", description: "Diseño gráfico, posts y material digital", specialty: "diseño gráfico digital, posts para redes sociales, material audiovisual, branding futurista y estética cybercore" },
+]
+
 interface EvaluationResult {
   originality: number
   aesthetic: number
@@ -153,6 +161,7 @@ interface GalleryImage {
 }
 
 export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativeCoins, onReward, petIdentity, petPower, stats }: CreativeLabProps) {
+  const [category, setCategory] = useState<LabCategory | null>(null)
   const [images, setImages] = useState<GalleryImage[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -265,10 +274,11 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
     setRewardAnimation(null)
     setRewardClaimed(false)
     try {
+      const catInfo = LAB_CATEGORIES.find(c => c.value === category)
       const res = await fetch("/api/evaluate-design", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: image }),
+        body: JSON.stringify({ imageBase64: image, specialty: catInfo?.specialty ?? "", categoryLabel: catInfo?.label ?? "Diseño" }),
       })
       const data = await res.json()
       if (data.evaluation) {
@@ -358,9 +368,48 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
               🧪 Laboratorio Creativo
             </h3>
             <p className="mt-1 text-[10px] text-primary/50 leading-relaxed max-w-sm mx-auto">
-              Sube una imagen de tu diseño. Un experto en moda futurista cyberpunk/cybercore/web3 lo evaluará.
+              Elige una especialidad y sube tu diseño para una evaluación experta.
             </p>
           </div>
+
+          {/* Category selector */}
+          <div className="grid grid-cols-3 gap-2">
+            {LAB_CATEGORIES.map((cat) => {
+              const isSelected = category === cat.value
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => setCategory(cat.value)}
+                  className="flex flex-col items-center gap-2 rounded-xl p-3 transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                  style={{
+                    background: isSelected ? `${accentColor}15` : "rgba(200,225,255,0.1)",
+                    border: isSelected ? `2px solid ${accentColor}60` : "1px solid rgba(200,220,240,0.4)",
+                    boxShadow: isSelected ? `0 0 12px ${accentColor}20` : "none",
+                  }}
+                >
+                  <span className="text-2xl">{cat.icon}</span>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-center leading-tight" style={{ color: isSelected ? accentColor : "rgba(0,0,0,0.5)" }}>
+                    {cat.label}
+                  </span>
+                  <span className="text-[7px] text-primary/30 text-center leading-tight hidden sm:block">
+                    {cat.description}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Show selected category label */}
+          {category && (
+            <div className="flex items-center justify-center gap-2">
+              <div className="h-px flex-1" style={{ background: `${accentColor}20` }} />
+              <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: accentColor }}>
+                {LAB_CATEGORIES.find(c => c.value === category)?.icon} {LAB_CATEGORIES.find(c => c.value === category)?.label}
+              </span>
+              <div className="h-px flex-1" style={{ background: `${accentColor}20` }} />
+            </div>
+          )}
 
           {/* Tab toggle: Evaluador / Historial */}
           <div className="flex gap-2">
@@ -579,14 +628,14 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
               {/* Evaluate Button */}
               <button
                 type="button"
-                disabled={!image || evaluating}
+                disabled={!image || evaluating || !category}
                 onClick={handleEvaluate}
                 className="w-full rounded-xl px-4 py-3.5 text-[10px] font-bold uppercase tracking-[0.15em] transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
                 style={{
-                  background: image && !evaluating ? `linear-gradient(135deg, ${accentColor}dd, ${accentColor})` : `${accentColor}20`,
-                  color: image && !evaluating ? "#fff" : `${accentColor}80`,
-                  border: `1px solid ${image && !evaluating ? accentColor : `${accentColor}30`}`,
-                  boxShadow: image && !evaluating ? `0 4px 15px ${accentColor}40` : "none",
+                  background: image && !evaluating && category ? `linear-gradient(135deg, ${accentColor}dd, ${accentColor})` : `${accentColor}20`,
+                  color: image && !evaluating && category ? "#fff" : `${accentColor}80`,
+                  border: `1px solid ${image && !evaluating && category ? accentColor : `${accentColor}30`}`,
+                  boxShadow: image && !evaluating && category ? `0 4px 15px ${accentColor}40` : "none",
                 }}
               >
                 {evaluating ? (
