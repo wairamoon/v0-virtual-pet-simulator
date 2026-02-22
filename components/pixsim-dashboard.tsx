@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import type { PixSimData } from "./pixsim-create"
 import { StatBar } from "./stat-bar"
-import { CharacterAvatar, defaultParts, outfitLabels } from "./character-builder"
+import { CharacterAvatar, defaultParts } from "./character-builder"
 import { RechargeButton } from "./recharge-button"
 import { PowerIcon } from "./power-icon"
 import { PowerEffect } from "./power-effects"
@@ -42,7 +42,8 @@ export function PixSimDashboard({
   const [showModal, setShowModal] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const [showLab, setShowLab] = useState(false)
-  const [rotating, setRotating] = useState(false)
+  const [avatarRotation, setAvatarRotation] = useState(0)
+  const [isRotating, setIsRotating] = useState(false)
 
   const color = energyColor[data.energy] ?? energyColor.sky
 
@@ -62,18 +63,11 @@ export function PixSimDashboard({
     return () => clearInterval(interval)
   }, [])
 
-  const rotateOutfit = useCallback((dir: 1 | -1) => {
-    if (rotating) return
-    setRotating(true)
-    setData((prev) => {
-      const current = prev.character?.outfit ?? 0
-      const next = ((current + dir + 4) % 4) as 0 | 1 | 2 | 3
-      const updated = { ...prev, character: { ...(prev.character ?? defaultParts), outfit: next } }
-      persist(updated)
-      return updated
-    })
-    setTimeout(() => setRotating(false), 400)
-  }, [rotating])
+  const rotateAvatar = useCallback((dir: 1 | -1) => {
+    setIsRotating(true)
+    setAvatarRotation((prev) => prev + dir * 25)
+    setTimeout(() => setIsRotating(false), 300)
+  }, [])
 
   const recharge = useCallback((stat: "emotional" | "vital" | "hunger") => {
     setData((prev) => {
@@ -91,7 +85,7 @@ export function PixSimDashboard({
         {/* ===== LEFT: Avatar Area (60% on desktop) ===== */}
         <div className="relative flex w-full flex-col items-center justify-center lg:w-[58%]">
           {/* Power effect behind avatar */}
-          <div className="relative flex items-center justify-center" style={{ minHeight: "420px" }}>
+          <div className="relative flex items-center justify-center" style={{ minHeight: "420px", perspective: "800px" }}>
             <div className="absolute inset-0 overflow-hidden rounded-3xl">
               <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
             </div>
@@ -105,7 +99,12 @@ export function PixSimDashboard({
 
             {/* Avatar — large + evolution overlay */}
             <div
-              className={`relative z-10 animate-float transition-all duration-400 ${rotating ? "scale-95 opacity-80" : "scale-100 opacity-100"}`}
+              className="relative z-10 animate-float"
+              style={{
+                transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: `rotateY(${avatarRotation}deg)`,
+                transformStyle: "preserve-3d",
+              }}
             >
               <CharacterAvatar
                 parts={data.character ?? defaultParts}
@@ -121,11 +120,11 @@ export function PixSimDashboard({
             </div>
           </div>
 
-          {/* Rotation arrows */}
-          <div className="mt-2 flex items-center gap-8">
+          {/* Rotation arrows — 3D rotate avatar */}
+          <div className="mt-2 flex items-center gap-12">
             <button
               type="button"
-              onClick={() => rotateOutfit(-1)}
+              onClick={() => rotateAvatar(-1)}
               className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
               style={{
                 background: "rgba(255,255,255,0.15)",
@@ -139,14 +138,9 @@ export function PixSimDashboard({
               </svg>
             </button>
 
-            {/* Outfit label */}
-            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/50">
-              {outfitLabels[data.character?.outfit ?? 0]}
-            </span>
-
             <button
               type="button"
-              onClick={() => rotateOutfit(1)}
+              onClick={() => rotateAvatar(1)}
               className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
               style={{
                 background: "rgba(255,255,255,0.15)",
