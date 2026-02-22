@@ -305,6 +305,32 @@ export function PixSimDashboard({
                 {showLab ? "✕ Cerrar Lab" : "🧪 Laboratorio Creativo"}
               </button>
 
+              {/* Creative XP display */}
+              {(data.creativeXP ?? 0) > 0 && (
+                <div
+                  className="flex items-center justify-between rounded-xl px-4 py-2.5"
+                  style={{ background: "rgba(156,124,244,0.08)", border: "1px solid rgba(156,124,244,0.15)" }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🧪</span>
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-[#9c7cf4]">XP Creativo</span>
+                  </div>
+                  <span className="text-sm font-bold text-[#9c7cf4]">{data.creativeXP ?? 0}</span>
+                </div>
+              )}
+              {(data.creativeCoins ?? 0) > 0 && (
+                <div
+                  className="flex items-center justify-between rounded-xl px-4 py-2.5"
+                  style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.15)" }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🪙</span>
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-[#d4a800]">Monedas Creativas</span>
+                  </div>
+                  <span className="text-sm font-bold text-[#d4a800]">{data.creativeCoins ?? 0}</span>
+                </div>
+              )}
+
               {/* Creation date */}
               <p className="text-center text-[8px] uppercase tracking-widest text-primary/30">
                 Creado el{" "}
@@ -357,6 +383,19 @@ export function PixSimDashboard({
               petName={data.name}
               accentColor={color}
               onClose={() => setShowLab(false)}
+              creativeXP={data.creativeXP ?? 0}
+              creativeCoins={data.creativeCoins ?? 0}
+              onReward={(xp, coins) => {
+                setData((prev) => {
+                  const next = {
+                    ...prev,
+                    creativeXP: (prev.creativeXP ?? 0) + xp,
+                    creativeCoins: (prev.creativeCoins ?? 0) + coins,
+                  }
+                  persist(next)
+                  return next
+                })
+              }}
             />
           </div>
         </div>

@@ -11,10 +11,27 @@ interface EvaluationResult {
   comment: string
 }
 
+interface RewardTier {
+  xp: number
+  coins: number
+  label: string
+  emoji: string
+}
+
+function getRewardTier(score: number): RewardTier {
+  if (score >= 90) return { xp: 50, coins: 30, label: "LEGENDARIO", emoji: "👑" }
+  if (score >= 75) return { xp: 30, coins: 20, label: "ÉPICO", emoji: "⚡" }
+  if (score >= 60) return { xp: 15, coins: 10, label: "NOTABLE", emoji: "✨" }
+  return { xp: 5, coins: 0, label: "EN PROGRESO", emoji: "🌱" }
+}
+
 interface CreativeLabProps {
   petName: string
   accentColor: string
   onClose: () => void
+  creativeXP: number
+  creativeCoins: number
+  onReward: (xp: number, coins: number) => void
 }
 
 function ScoreRing({ value, label, icon, color }: { value: number; label: string; icon: string; color: string }) {
@@ -75,13 +92,15 @@ function TotalScoreBadge({ score, color }: { score: number; color: string }) {
   )
 }
 
-export function CreativeLab({ petName, accentColor, onClose }: CreativeLabProps) {
+export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativeCoins, onReward }: CreativeLabProps) {
   const [image, setImage] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [evaluating, setEvaluating] = useState(false)
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [rewardAnimation, setRewardAnimation] = useState<RewardTier | null>(null)
+  const [rewardClaimed, setRewardClaimed] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handleFile(file: File) {
@@ -112,6 +131,8 @@ export function CreativeLab({ petName, accentColor, onClose }: CreativeLabProps)
     setFileName(null)
     setEvaluation(null)
     setError(null)
+    setRewardAnimation(null)
+    setRewardClaimed(false)
     if (inputRef.current) inputRef.current.value = ""
   }
 
@@ -120,6 +141,8 @@ export function CreativeLab({ petName, accentColor, onClose }: CreativeLabProps)
     setEvaluating(true)
     setError(null)
     setEvaluation(null)
+    setRewardAnimation(null)
+    setRewardClaimed(false)
     try {
       const res = await fetch("/api/evaluate-design", {
         method: "POST",
@@ -129,6 +152,16 @@ export function CreativeLab({ petName, accentColor, onClose }: CreativeLabProps)
       const data = await res.json()
       if (data.evaluation) {
         setEvaluation(data.evaluation)
+        // Trigger reward animation after a short delay
+        const reward = getRewardTier(data.evaluation.totalScore)
+        setTimeout(() => {
+          setRewardAnimation(reward)
+          // Auto-claim after animation
+          setTimeout(() => {
+            onReward(reward.xp, reward.coins)
+            setRewardClaimed(true)
+          }, 2000)
+        }, 800)
       } else {
         setError(data.error || "Error en la evaluación")
       }
@@ -349,6 +382,56 @@ export function CreativeLab({ petName, accentColor, onClose }: CreativeLabProps)
               </div>
             )}
           </div>
+
+          {/* Reward Animation */}
+          {rewardAnimation && evaluation && (
+            <div
+              className="rounded-2xl p-5 text-center animate-fade-in"
+              style={{
+                background: rewardClaimed
+                  ? "rgba(76,175,80,0.08)"
+                  : "linear-gradient(135deg, rgba(156,124,244,0.1), rgba(255,215,0,0.1))",
+                border: `1px solid ${rewardClaimed ? "rgba(76,175,80,0.2)" : "rgba(156,124,244,0.3)"}`,
+              }}
+            >
+              {!rewardClaimed ? (
+                /* Animated reward reveal */
+                <div className="flex flex-col items-center gap-3">
+                  <div className="text-4xl" style={{ animation: "bounce 0.6s ease-in-out infinite" }}>
+                    {rewardAnimation.emoji}
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: accentColor }}>
+                    ¡Recompensa Desbloqueada!
+                  </p>
+                  <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-2xl font-bold text-[#9c7cf4]">+{rewardAnimation.xp}</span>
+                      <span className="text-[8px] font-semibold uppercase tracking-wider text-[#9c7cf4]/60">XP Creativo</span>
+                    </div>
+                    {rewardAnimation.coins > 0 && (
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-2xl font-bold text-[#d4a800]">+{rewardAnimation.coins}</span>
+                        <span className="text-[8px] font-semibold uppercase tracking-wider text-[#d4a800]/60">Monedas</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-1 mt-1">
+                    {["✦", "✧", "✦", "✧", "✦"].map((s, i) => (
+                      <span key={i} className="text-xs" style={{ color: accentColor, opacity: 0.4 + (i % 2) * 0.3, animation: `pulse ${1 + i * 0.2}s ease-in-out infinite` }}>{s}</span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Claimed confirmation */
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-2xl">✅</span>
+                  <p className="text-[10px] font-semibold text-green-600">
+                    Recompensa reclamada • XP: {creativeXP} • Monedas: {creativeCoins}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {!image && !evaluation && (
             <p className="text-center text-[8px] text-primary/25 uppercase tracking-widest">

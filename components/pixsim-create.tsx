@@ -22,6 +22,8 @@ export interface PixSimData {
   hunger: number
   createdAt: string
   character: CharacterParts
+  creativeXP?: number
+  creativeCoins?: number
 }
 
 const identityOptions = [
