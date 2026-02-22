@@ -272,6 +272,19 @@ export function PixSimDashboard({
               {/* Separator */}
               <div className="h-px bg-gray-200" />
 
+              {/* Lab toggle — arriba de alimentar */}
+              <button
+                type="button"
+                onClick={() => { setShowLab(!showLab); if (!showLab) setShowChat(false) }}
+                className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: showLab ? "rgba(200,220,240,0.3)" : `${color}20`,
+                  border: `1px solid ${showLab ? "rgba(200,220,240,0.5)" : `${color}40`}`,
+                }}
+              >
+                {showLab ? "✕ Cerrar Lab" : "🧪 Laboratorio Creativo"}
+              </button>
+
               {/* Feed button */}
               <FeedButton
                 petName={data.name}
@@ -296,19 +309,6 @@ export function PixSimDashboard({
                 }}
               >
                 {showChat ? "✕ Cerrar Chat" : `💬 Hablar con ${data.name}`}
-              </button>
-
-              {/* Lab toggle */}
-              <button
-                type="button"
-                onClick={() => { setShowLab(!showLab); if (!showLab) setShowChat(false) }}
-                className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: showLab ? "rgba(200,220,240,0.3)" : `${color}20`,
-                  border: `1px solid ${showLab ? "rgba(200,220,240,0.5)" : `${color}40`}`,
-                }}
-              >
-                {showLab ? "✕ Cerrar Lab" : "🧪 Laboratorio Creativo"}
               </button>
 
               {/* Evolution Level + Creative Stats */}
