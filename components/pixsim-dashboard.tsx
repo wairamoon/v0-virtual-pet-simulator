@@ -392,14 +392,16 @@ export function PixSimDashboard({
               creativeCoins={data.creativeCoins ?? 0}
               onReward={(xp, coins) => {
                 setData((prev) => {
+                  const hungerBoost = coins > 0 ? Math.max(10, coins) : 5
+                  const vitalBoost = Math.max(5, Math.round(xp * 0.5))
+                  const emotionalBoost = Math.max(3, Math.round(xp * 0.2))
                   const next = {
                     ...prev,
                     creativeXP: (prev.creativeXP ?? 0) + xp,
                     creativeCoins: (prev.creativeCoins ?? 0) + coins,
-                    // Recargar stats con las recompensas
-                    emotional: Math.min(100, prev.emotional + Math.round(xp * 0.3)),
-                    vital: Math.min(100, prev.vital + Math.round(xp * 0.2)),
-                    hunger: Math.min(100, prev.hunger + Math.round(coins * 0.5)),
+                    hunger: Math.min(100, prev.hunger + hungerBoost),
+                    vital: Math.min(100, prev.vital + vitalBoost),
+                    emotional: Math.min(100, prev.emotional + emotionalBoost),
                   }
                   persist(next)
                   return next
