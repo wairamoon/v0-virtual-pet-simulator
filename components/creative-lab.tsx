@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
+import { getEvolutionLevel } from "./evolution-overlay"
 
 interface EvaluationResult {
   originality: number
@@ -23,6 +24,50 @@ function getRewardTier(score: number): RewardTier {
   if (score >= 75) return { xp: 30, coins: 20, label: "ÉPICO", emoji: "⚡" }
   if (score >= 60) return { xp: 15, coins: 10, label: "NOTABLE", emoji: "✨" }
   return { xp: 5, coins: 0, label: "EN PROGRESO", emoji: "🌱" }
+}
+
+interface LabHistoryEntry {
+  id: string
+  thumbnail: string // small base64
+  date: string
+  totalScore: number
+  originality: number
+  aesthetic: number
+  web3Potential: number
+  visualImpact: number
+  comment: string
+  levelAtTime: number
+  levelTitle: string
+  xpEarned: number
+  coinsEarned: number
+}
+
+const HISTORY_KEY = "pixsim-lab-history"
+
+function loadHistory(): LabHistoryEntry[] {
+  if (typeof window === "undefined") return []
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]") } catch { return [] }
+}
+
+function saveHistory(entries: LabHistoryEntry[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, 50)))
+}
+
+/** Resize image to small thumbnail for storage */
+function createThumbnail(dataUrl: string, maxW = 120): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image()
+    img.onload = () => {
+      const scale = maxW / img.width
+      const canvas = document.createElement("canvas")
+      canvas.width = maxW
+      canvas.height = img.height * scale
+      const ctx = canvas.getContext("2d")!
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      resolve(canvas.toDataURL("image/jpeg", 0.6))
+    }
+    img.src = dataUrl
+  })
 }
 
 interface CreativeLabProps {
@@ -101,7 +146,14 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
   const [error, setError] = useState<string | null>(null)
   const [rewardAnimation, setRewardAnimation] = useState<RewardTier | null>(null)
   const [rewardClaimed, setRewardClaimed] = useState(false)
+  const [history, setHistory] = useState<LabHistoryEntry[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+  const [expandedHistory, setExpandedHistory] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setHistory(loadHistory())
+  }, [])
 
   function handleFile(file: File) {
     if (!file.type.startsWith("image/")) return
@@ -152,8 +204,29 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
       const data = await res.json()
       if (data.evaluation) {
         setEvaluation(data.evaluation)
-        // Trigger reward animation after a short delay
+        // Save to history
         const reward = getRewardTier(data.evaluation.totalScore)
+        const currentLevel = getEvolutionLevel(creativeXP)
+        const thumb = await createThumbnail(image)
+        const entry: LabHistoryEntry = {
+          id: Date.now().toString(36),
+          thumbnail: thumb,
+          date: new Date().toISOString(),
+          totalScore: data.evaluation.totalScore,
+          originality: data.evaluation.originality,
+          aesthetic: data.evaluation.aesthetic,
+          web3Potential: data.evaluation.web3Potential,
+          visualImpact: data.evaluation.visualImpact,
+          comment: data.evaluation.comment,
+          levelAtTime: currentLevel.level,
+          levelTitle: currentLevel.title,
+          xpEarned: reward.xp,
+          coinsEarned: reward.coins,
+        }
+        const updated = [entry, ...history].slice(0, 50)
+        setHistory(updated)
+        saveHistory(updated)
+        // Trigger reward animation after a short delay
         setTimeout(() => {
           setRewardAnimation(reward)
           // Auto-claim after animation
@@ -221,6 +294,100 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
             </p>
           </div>
 
+          {/* Tab toggle: Evaluador / Historial */}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setShowHistory(false)}
+              className="flex-1 rounded-xl py-2 text-[9px] font-bold uppercase tracking-wider transition-all"
+              style={{
+                background: !showHistory ? `${accentColor}15` : "transparent",
+                color: !showHistory ? accentColor : "rgba(0,0,0,0.3)",
+                border: `1px solid ${!showHistory ? `${accentColor}30` : "rgba(0,0,0,0.06)"}`,
+              }}>
+              🔬 Evaluador
+            </button>
+            <button type="button" onClick={() => setShowHistory(true)}
+              className="flex-1 rounded-xl py-2 text-[9px] font-bold uppercase tracking-wider transition-all"
+              style={{
+                background: showHistory ? `${accentColor}15` : "transparent",
+                color: showHistory ? accentColor : "rgba(0,0,0,0.3)",
+                border: `1px solid ${showHistory ? `${accentColor}30` : "rgba(0,0,0,0.06)"}`,
+              }}>
+              📜 Historial ({history.length})
+            </button>
+          </div>
+
+          {showHistory ? (
+            /* ===== HISTORY VIEW ===== */
+            <div className="flex flex-col gap-3 animate-fade-in">
+              {history.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-3xl mb-2">🧪</p>
+                  <p className="text-[10px] text-primary/40">Aún no hay evaluaciones. ¡Sube tu primer diseño!</p>
+                </div>
+              ) : history.map((entry) => {
+                const isExpanded = expandedHistory === entry.id
+                const tier = getRewardTier(entry.totalScore)
+                return (
+                  <div key={entry.id}
+                    className="rounded-xl overflow-hidden transition-all cursor-pointer"
+                    style={{ background: "rgba(200,225,255,0.1)", border: "1px solid rgba(200,220,240,0.3)" }}
+                    onClick={() => setExpandedHistory(isExpanded ? null : entry.id)}>
+                    {/* Summary row */}
+                    <div className="flex items-center gap-3 p-3">
+                      <img src={entry.thumbnail} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{tier.emoji}</span>
+                          <span className="text-[11px] font-bold" style={{ color: accentColor }}>{entry.totalScore}</span>
+                          <span className="text-[8px] uppercase tracking-wider text-primary/30">{tier.label}</span>
+                        </div>
+                        <p className="text-[8px] text-primary/40 mt-0.5">
+                          {new Date(entry.date).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          {" • Nv."}{entry.levelAtTime} {entry.levelTitle}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-primary/20">{isExpanded ? "▼" : "▶"}</span>
+                    </div>
+
+                    {/* Expanded details */}
+                    {isExpanded && (
+                      <div className="px-3 pb-3 flex flex-col gap-3 border-t border-[rgba(200,220,240,0.3)] pt-3 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                        {/* Score bars */}
+                        <div className="flex flex-col gap-1.5">
+                          {[
+                            { label: "Originalidad", value: entry.originality, color: "#e0457b" },
+                            { label: "Coherencia Estética", value: entry.aesthetic, color: "#9c7cf4" },
+                            { label: "Potencial Web3", value: entry.web3Potential, color: "#4a9eff" },
+                            { label: "Impacto Visual", value: entry.visualImpact, color: "#00bcd4" },
+                          ].map((item) => (
+                            <div key={item.label} className="flex items-center gap-2">
+                              <span className="text-[8px] text-primary/40 w-28 flex-shrink-0">{item.label}</span>
+                              <div className="flex-1 h-1.5 rounded-full bg-gray-100">
+                                <div className="h-1.5 rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
+                              </div>
+                              <span className="text-[9px] font-bold w-7 text-right" style={{ color: item.color }}>{item.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Comment */}
+                        <div className="rounded-lg p-2.5" style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(200,220,240,0.3)" }}>
+                          <p className="text-[10px] text-primary/60 italic leading-relaxed">&ldquo;{entry.comment}&rdquo;</p>
+                        </div>
+                        {/* Rewards earned */}
+                        <div className="flex items-center gap-3 text-[8px] text-primary/40">
+                          <span>🧪 +{entry.xpEarned} XP</span>
+                          {entry.coinsEarned > 0 && <span>🪙 +{entry.coinsEarned} monedas</span>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+
+          /* ===== EVALUATOR VIEW (existing) ===== */
+          <>
           {/* Main content: Image + Results side by side on desktop */}
           <div className="flex flex-col lg:flex-row gap-5">
             {/* LEFT: Upload zone */}
@@ -437,6 +604,8 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
             <p className="text-center text-[8px] text-primary/25 uppercase tracking-widest">
               Sube una imagen para activar la evaluación
             </p>
+          )}
+          </>
           )}
         </div>
       </div>
