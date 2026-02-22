@@ -5,17 +5,56 @@ import { getEvolutionLevel } from "./evolution-overlay"
 
 type LabCategory = "nails" | "clothing" | "content"
 
-const LAB_CATEGORIES: { value: LabCategory; label: string; icon: string; description: string; specialty: string }[] = [
-  { value: "nails", label: "Diseño de Uñas", icon: "💅", description: "Nail art futurista, cyberpunk y experimental", specialty: "nail art futurista, cyberpunk, chrome effects, 3D nail art, tech-inspired designs y tendencias Web3" },
-  { value: "clothing", label: "Diseño de Ropa", icon: "👗", description: "Moda cyberpunk, retro tech y Web3", specialty: "moda cyberpunk, retro tech, cybercore, streetwear futurista y moda Web3" },
-  { value: "content", label: "Post & Audiovisual", icon: "🎬", description: "Diseño gráfico, posts y material digital", specialty: "diseño gráfico digital, posts para redes sociales, material audiovisual, branding futurista y estética cybercore" },
+interface CategoryConfig {
+  value: LabCategory
+  label: string
+  icon: string
+  description: string
+  specialty: string
+  metrics: { key: string; label: string; icon: string; color: string }[]
+}
+
+const LAB_CATEGORIES: CategoryConfig[] = [
+  {
+    value: "clothing", label: "Diseño de Ropa", icon: "👗",
+    description: "Moda cyberpunk, retro tech y Web3",
+    specialty: "moda cyberpunk, retro tech, cybercore, streetwear futurista y moda Web3",
+    metrics: [
+      { key: "originality", label: "Originalidad", icon: "💡", color: "#e0457b" },
+      { key: "aesthetic", label: "Coherencia Estética", icon: "🎨", color: "#9c7cf4" },
+      { key: "web3Potential", label: "Potencial Web3", icon: "🌐", color: "#4a9eff" },
+      { key: "visualImpact", label: "Impacto Visual", icon: "⚡", color: "#00bcd4" },
+      { key: "cybercore", label: "Nivel Cybercore", icon: "🤖", color: "#ff5722" },
+    ],
+  },
+  {
+    value: "nails", label: "Diseño de Uñas", icon: "💅",
+    description: "Nail art futurista, cyberpunk y experimental",
+    specialty: "nail art futurista, cyberpunk, chrome effects, 3D nail art, tech-inspired designs y tendencias Web3",
+    metrics: [
+      { key: "technicalDetail", label: "Detalle Técnico", icon: "🔍", color: "#e0457b" },
+      { key: "patternCreativity", label: "Creatividad del Patrón", icon: "✨", color: "#9c7cf4" },
+      { key: "trendStyle", label: "Tendencia y Estilo", icon: "🔥", color: "#ff5722" },
+      { key: "visualPrecision", label: "Precisión Visual", icon: "🎯", color: "#4a9eff" },
+      { key: "microImpact", label: "Impacto en Microformato", icon: "💎", color: "#00bcd4" },
+    ],
+  },
+  {
+    value: "content", label: "Post & Audiovisual", icon: "🎬",
+    description: "Diseño gráfico, posts y material digital",
+    specialty: "diseño gráfico digital, posts para redes sociales, material audiovisual, branding futurista y estética cybercore",
+    metrics: [
+      { key: "composition", label: "Composición Visual", icon: "🖼️", color: "#e0457b" },
+      { key: "messageClear", label: "Claridad del Mensaje", icon: "💬", color: "#9c7cf4" },
+      { key: "branding", label: "Branding", icon: "🏷️", color: "#ff5722" },
+      { key: "digitalImpact", label: "Impacto Digital", icon: "📱", color: "#4a9eff" },
+      { key: "viralPotential", label: "Potencial Viral", icon: "🚀", color: "#00bcd4" },
+    ],
+  },
 ]
 
 interface EvaluationResult {
-  originality: number
-  aesthetic: number
-  web3Potential: number
-  visualImpact: number
+  [key: string]: number | string
   totalScore: number
   comment: string
 }
@@ -216,6 +255,8 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
 
   const selectedImage = images.find(img => img.id === selectedId) ?? null
   const image = selectedImage?.dataUrl ?? null
+  const currentCategoryConfig = LAB_CATEGORIES.find(c => c.value === category)
+  const currentMetrics = currentCategoryConfig?.metrics ?? LAB_CATEGORIES[0].metrics
 
   function handleFile(file: File) {
     if (!file.type.startsWith("image/")) return
@@ -275,10 +316,18 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
     setRewardClaimed(false)
     try {
       const catInfo = LAB_CATEGORIES.find(c => c.value === category)
+      const metricKeys = catInfo?.metrics.map(m => m.key) ?? []
+      const metricLabels = catInfo?.metrics.map(m => `${m.key}: ${m.label}`) ?? []
       const res = await fetch("/api/evaluate-design", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: image, specialty: catInfo?.specialty ?? "", categoryLabel: catInfo?.label ?? "Diseño" }),
+        body: JSON.stringify({
+          imageBase64: image,
+          specialty: catInfo?.specialty ?? "",
+          categoryLabel: catInfo?.label ?? "Diseño",
+          metricKeys,
+          metricLabels,
+        }),
       })
       const data = await res.json()
       if (data.evaluation) {
@@ -678,12 +727,11 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
                     <TotalScoreBadge score={evaluation.totalScore} color={accentColor} />
                   </div>
 
-                  {/* Score Rings */}
-                  <div className="grid grid-cols-2 gap-4 justify-items-center sm:grid-cols-4">
-                    <ScoreRing value={evaluation.originality} label="Originalidad" icon="💡" color="#e0457b" />
-                    <ScoreRing value={evaluation.aesthetic} label="Coherencia Estética" icon="🎨" color="#9c7cf4" />
-                    <ScoreRing value={evaluation.web3Potential} label="Potencial Web3" icon="🌐" color="#4a9eff" />
-                    <ScoreRing value={evaluation.visualImpact} label="Impacto Visual" icon="⚡" color="#00bcd4" />
+                  {/* Score Rings — dynamic per category */}
+                  <div className="grid grid-cols-2 gap-4 justify-items-center sm:grid-cols-3 lg:grid-cols-5">
+                    {currentMetrics.map((m) => (
+                      <ScoreRing key={m.key} value={Number(evaluation[m.key]) || 0} label={m.label} icon={m.icon} color={m.color} />
+                    ))}
                   </div>
 
                   {/* Separator */}
@@ -708,14 +756,9 @@ export function CreativeLab({ petName, accentColor, onClose, creativeXP, creativ
                     </p>
                   </div>
 
-                  {/* Score breakdown mini */}
+                  {/* Score breakdown mini — dynamic */}
                   <div className="flex flex-col gap-1.5">
-                    {[
-                      { label: "Originalidad", value: evaluation.originality, color: "#e0457b" },
-                      { label: "Coherencia Estética", value: evaluation.aesthetic, color: "#9c7cf4" },
-                      { label: "Potencial Web3", value: evaluation.web3Potential, color: "#4a9eff" },
-                      { label: "Impacto Visual", value: evaluation.visualImpact, color: "#00bcd4" },
-                    ].map((item) => (
+                    {currentMetrics.map((m) => ({ label: m.label, value: Number(evaluation[m.key]) || 0, color: m.color })).map((item) => (
                       <div key={item.label} className="flex items-center gap-2">
                         <span className="text-[8px] text-primary/40 w-28 flex-shrink-0">{item.label}</span>
                         <div className="flex-1 h-1.5 rounded-full bg-gray-100">

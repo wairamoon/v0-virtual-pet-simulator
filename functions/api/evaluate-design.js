@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { imageBase64, specialty, categoryLabel } = body;
+    const { imageBase64, specialty, categoryLabel, metricKeys, metricLabels } = body;
 
     if (!imageBase64) {
       return Response.json({ error: "No image provided" }, { status: 400 });
@@ -31,19 +31,17 @@ export async function onRequestPost(context) {
 
 Categoría de evaluación: ${categoryLabel || "Diseño General"}.
 
-Evalúa la imagen que te envíen como si fueras un mentor creativo de una academia futurista especializado en esta categoría. Sé profesional pero inspirador. Adapta tus criterios a la categoría específica.
+Evalúa la imagen según estos 5 criterios específicos de esta categoría:
+${(metricLabels || ["originality: Originalidad", "aesthetic: Coherencia Estética", "web3Potential: Potencial Web3", "visualImpact: Impacto Visual", "cybercore: Nivel Cybercore"]).map((l, i) => `${i+1}. ${l}`).join("\n")}
 
 Responde ÚNICAMENTE con JSON válido (sin markdown, sin backticks):
 {
-  "originality": <número 0-100>,
-  "aesthetic": <número 0-100>,
-  "web3Potential": <número 0-100>,
-  "visualImpact": <número 0-100>,
-  "totalScore": <promedio de los 4 scores, redondeado>,
-  "comment": "<comentario profesional de 2-3 oraciones como mentor creativo futurista, en español>"
+  ${(metricKeys || ["originality", "aesthetic", "web3Potential", "visualImpact", "cybercore"]).map(k => `"${k}": <número 0-100>`).join(",\n  ")},
+  "totalScore": <promedio de los 5 scores, redondeado>,
+  "comment": "<comentario profesional de 2-3 oraciones como mentor creativo futurista especializado en ${categoryLabel || "diseño"}, en español>"
 }
 
-Sé justo pero motivador. Si el diseño es básico, da feedback constructivo. Si es increíble, celébralo.`,
+Sé justo pero motivador. Adapta tu feedback a la categoría específica.`,
           },
           {
             role: "user",
