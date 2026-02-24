@@ -108,3 +108,50 @@
     min-height: 80vh;
   }
 }
+
+/* ─── Fire Companion (Calcifer) ─── */
+.fire-companion {
+  position: absolute;
+  right: -35%;
+  bottom: 10%;
+  width: 120px;
+  height: 120px;
+  z-index: 15;
+  animation: companion-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 12px rgba(255, 87, 34, 0.4));
+}
+
+.fire-companion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.fire-smile {
+  display: none; /* image already has a face */
+}
+
+@keyframes companion-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  33% { transform: translateY(-12px) rotate(1deg); }
+  66% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+/* Bigger on desktop */
+@media (min-width: 1025px) {
+  .fire-companion {
+    width: 160px;
+    height: 160px;
+    right: -40%;
+    bottom: 15%;
+  }
+}
+
+/* Smaller on tiny screens */
+@media (max-height: 700px) {
+  .fire-companion {
+    width: 80px;
+    height: 80px;
+  }
+}

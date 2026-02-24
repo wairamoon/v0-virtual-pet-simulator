@@ -120,6 +120,19 @@ export function PixSimDashboard({
                 size={Math.round(typeof window !== "undefined" ? window.innerHeight * 0.5 : 320)}
                 color={getEvolutionLevel(data.creativeXP ?? 0).color}
               />
+
+              {/* Fire companion — Calcifer style */}
+              {(data.energy === "fire") && (
+                <div className="fire-companion" aria-label="Compañero de fuego">
+                  <img
+                    src="/images/fire-companion.png"
+                    alt="Fire companion"
+                    className="fire-companion-img"
+                  />
+                  {/* Smile overlay */}
+                  <div className="fire-smile">◡̈</div>
+                </div>
+              )}
             </div>
           </div>
 
