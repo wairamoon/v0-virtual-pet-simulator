@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useHub } from "../hooks/useHub"
 
 interface RegisterHubProps {
   onRegistered: (hubId: string) => void
@@ -8,8 +9,7 @@ interface RegisterHubProps {
 
 export function RegisterHub({ onRegistered }: RegisterHubProps) {
   const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { registerRegenmon, loading, error } = useHub()
 
   // Check if already registered on mount
   useEffect(() => {
@@ -21,54 +21,27 @@ export function RegisterHub({ onRegistered }: RegisterHubProps) {
   }, [onRegistered])
 
   async function handleRegister() {
-    setLoading(true)
-    setError(null)
+    // Read pet data from localStorage
+    const raw = localStorage.getItem("pixsim-data")
+    if (!raw) return
 
-    try {
-      // Read pet data from localStorage
-      const raw = localStorage.getItem("pixsim-data")
-      if (!raw) {
-        setError("No se encontró tu PixSim. Crea uno primero.")
-        setLoading(false)
-        return
-      }
+    const petData = JSON.parse(raw)
+    const appUrl = window.location.origin
+    const sprite = `${appUrl}/pixel-${petData.energy || "water"}.png`
 
-      const petData = JSON.parse(raw)
-      const name = petData.name || "PixSim"
-      const ownerName = petData.name || "Anónimo"
-      const appUrl = window.location.origin
-      // Generate sprite from character energy type
-      const sprite = `${appUrl}/pixel-${petData.energy || "water"}.png`
+    const result = await registerRegenmon({
+      name: petData.name || "PixSim",
+      ownerName: petData.name || "Anónimo",
+      appUrl,
+      sprite,
+      email: email.trim() || undefined,
+    })
 
-      const res = await fetch("https://regenmon-final.vercel.app/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          ownerName,
-          appUrl,
-          sprite,
-          email: email.trim() || undefined,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (res.ok && data.data?.id) {
-        localStorage.setItem("hubRegenmonId", data.data.id)
-        localStorage.setItem("isRegisteredInHub", "true")
-        onRegistered(data.data.id)
-      } else if (data.alreadyRegistered && data.data?.id) {
-        localStorage.setItem("hubRegenmonId", data.data.id)
-        localStorage.setItem("isRegisteredInHub", "true")
-        onRegistered(data.data.id)
-      } else {
-        setError(data.error || "Error al registrar. Intenta de nuevo.")
-      }
-    } catch (e) {
-      setError("Error de conexión. Intenta de nuevo.")
-    } finally {
-      setLoading(false)
+    const id = result?.data?.id
+    if (id) {
+      localStorage.setItem("hubRegenmonId", id)
+      localStorage.setItem("isRegisteredInHub", "true")
+      onRegistered(id)
     }
   }
 
@@ -104,7 +77,7 @@ export function RegisterHub({ onRegistered }: RegisterHubProps) {
       />
 
       {error && (
-        <p style={{ fontSize: "12px", color: "#ff4444" }}>{error}</p>
+        <p style={{ fontSize: "12px", color: "#e67e22" }}>{error}</p>
       )}
 
       <button
