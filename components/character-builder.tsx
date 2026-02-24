@@ -63,10 +63,19 @@ interface Props {
   className?: string
 }
 
+// Map skin tone hex to CSS brightness/contrast adjustments
+const skinFilter: Record<string, string> = {
+  "#fae4d8": "none",                                    // Claro — base (no filter)
+  "#e8b896": "brightness(0.92) saturate(1.1)",          // Medio
+  "#c68c5a": "brightness(0.82) saturate(1.2)",          // Moreno
+  "#8d5e3c": "brightness(0.68) saturate(1.3) contrast(1.05)", // Oscuro
+}
+
 export function CharacterAvatar({ parts, energyColor, identity, size = 200, className = "" }: Props) {
-  const { outfit } = parts
+  const { outfit, skinTone } = parts
   const identityMap = outfitImages[identity] ?? outfitImages["femenino"]
   const src = identityMap[outfit] ?? identityMap[0]
+  const filter = skinFilter[skinTone] ?? "none"
 
   return (
     <div className={`relative ${className}`}>
@@ -84,6 +93,7 @@ export function CharacterAvatar({ parts, energyColor, identity, size = 200, clas
           width={size}
           height={size * 1.5}
           className="h-full w-full object-contain drop-shadow-lg"
+          style={{ filter }}
           priority
         />
       </div>
