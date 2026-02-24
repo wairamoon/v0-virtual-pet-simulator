@@ -88,9 +88,12 @@ export function PixSimDashboard({
         <div className="avatar-stage-wrapper relative flex w-full flex-col items-center justify-center lg:w-[58%]">
           {/* Avatar stage — absolute centered, 80vh */}
           <div className="avatar-stage">
-            <div className="absolute inset-0 overflow-hidden rounded-3xl">
-              <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
-            </div>
+            {/* Power effect — hidden for fire (companion replaces it) */}
+            {data.energy !== "fire" && (
+              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
+              </div>
+            )}
 
             {/* Ground shadow */}
             <div
