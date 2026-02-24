@@ -123,40 +123,7 @@ export function PixSimDashboard({
             </div>
           </div>
 
-          {/* Rotation arrows — flanking avatar */}
-          <div className="avatar-arrows mt-2 flex items-center gap-12">
-            <button
-              type="button"
-              onClick={() => rotateAvatar(-1)}
-              className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                backdropFilter: "blur(8px)",
-              }}
-              aria-label="Rotar izquierda"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:-translate-x-0.5">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => rotateAvatar(1)}
-              className="group flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90"
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                backdropFilter: "blur(8px)",
-              }}
-              aria-label="Rotar derecha"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-0.5">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </div>
+          {/* Rotation arrows removed */}
 
           {/* Name + power below avatar on mobile */}
           <div className="mt-3 text-center lg:hidden">
