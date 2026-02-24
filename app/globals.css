@@ -113,9 +113,9 @@
 .energy-companion {
   position: absolute;
   right: -40%;
-  bottom: 25%;
-  width: 200px;
-  height: 200px;
+  bottom: 15%;
+  width: 400px;
+  height: 400px;
   z-index: 15;
 }
 
@@ -155,17 +155,17 @@
 /* Bigger on desktop */
 @media (min-width: 1025px) {
   .energy-companion {
-    width: 250px;
-    height: 250px;
+    width: 500px;
+    height: 500px;
     right: -45%;
-    bottom: 25%;
+    bottom: 15%;
   }
 }
 
 /* Smaller on tiny screens */
 @media (max-height: 700px) {
   .energy-companion {
-    width: 140px;
-    height: 140px;
+    width: 280px;
+    height: 280px;
   }
 }
