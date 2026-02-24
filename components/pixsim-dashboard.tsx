@@ -88,8 +88,8 @@ export function PixSimDashboard({
         <div className="avatar-stage-wrapper relative flex w-full flex-col items-center justify-center lg:w-[58%]">
           {/* Avatar stage — absolute centered, 80vh */}
           <div className="avatar-stage">
-            {/* Power effect — hidden for fire (companion replaces it) */}
-            {data.energy !== "fire" && (
+            {/* Power effect — hidden for fire/water (companions replace them) */}
+            {data.energy !== "fire" && data.energy !== "water" && data.energy !== "aqua" && data.energy !== "sky" && (
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
                 <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
               </div>
@@ -124,16 +124,17 @@ export function PixSimDashboard({
                 color={getEvolutionLevel(data.creativeXP ?? 0).color}
               />
 
-              {/* Fire companion — Calcifer style */}
+              {/* Fire companion */}
               {(data.energy === "fire") && (
-                <div className="fire-companion" aria-label="Compañero de fuego">
-                  <img
-                    src="/images/fire-companion.png"
-                    alt="Fire companion"
-                    className="fire-companion-img"
-                  />
-                  {/* Smile overlay */}
-                  <div className="fire-smile">◡̈</div>
+                <div className="energy-companion fire-companion" aria-label="Compañero de fuego">
+                  <img src="/images/fire-companion.png" alt="Fire companion" className="companion-img" />
+                </div>
+              )}
+
+              {/* Water companion */}
+              {(data.energy === "water" || data.energy === "aqua" || data.energy === "sky") && (
+                <div className="energy-companion water-companion" aria-label="Compañero de agua">
+                  <img src="/images/water-companion.png" alt="Water companion" className="companion-img" />
                 </div>
               )}
             </div>

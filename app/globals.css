@@ -109,27 +109,36 @@
   }
 }
 
-/* ─── Fire Companion (Calcifer) ─── */
-.fire-companion {
+/* ─── Energy Companions ─── */
+.energy-companion {
   position: absolute;
   right: -40%;
   bottom: 25%;
   width: 200px;
   height: 200px;
   z-index: 15;
+}
+
+.companion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Fire */
+.fire-companion {
   animation: companion-float 3s ease-in-out infinite;
   filter: drop-shadow(0 4px 12px rgba(255, 87, 34, 0.4));
 }
 
-.fire-companion-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.fire-companion .companion-img {
   image-rendering: pixelated;
 }
 
-.fire-smile {
-  display: none; /* image already has a face */
+/* Water */
+.water-companion {
+  animation: water-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 16px rgba(0, 150, 255, 0.4));
 }
 
 @keyframes companion-float {
@@ -138,9 +147,14 @@
   66% { transform: translateY(-4px) rotate(-1deg); }
 }
 
+@keyframes water-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
 /* Bigger on desktop */
 @media (min-width: 1025px) {
-  .fire-companion {
+  .energy-companion {
     width: 250px;
     height: 250px;
     right: -45%;
@@ -150,7 +164,7 @@
 
 /* Smaller on tiny screens */
 @media (max-height: 700px) {
-  .fire-companion {
+  .energy-companion {
     width: 140px;
     height: 140px;
   }
