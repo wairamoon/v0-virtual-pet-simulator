@@ -11,6 +11,7 @@ import { HeartIcon, MuscleIcon, FruitIcon } from "./stat-icons"
 import { PixSimChat } from "./pixsim-chat"
 import { FeedButton } from "./feed-button"
 import { CreativeLab } from "./creative-lab"
+import { SocialTab } from "./social-tab"
 import { EvolutionOverlay, LevelBadge, getEvolutionLevel } from "./evolution-overlay"
 
 const energyColor: Record<string, string> = {
@@ -42,6 +43,7 @@ export function PixSimDashboard({
   const [showModal, setShowModal] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const [showLab, setShowLab] = useState(false)
+  const [showSocial, setShowSocial] = useState(false)
   const [avatarRotation, setAvatarRotation] = useState(0)
   const [isRotating, setIsRotating] = useState(false)
 
@@ -305,6 +307,19 @@ export function PixSimDashboard({
                 {showChat ? "✕ Cerrar Chat" : `💬 Hablar con ${data.name}`}
               </button>
 
+              {/* Social toggle */}
+              <button
+                type="button"
+                onClick={() => { setShowSocial(!showSocial); if (!showSocial) { setShowChat(false); setShowLab(false) } }}
+                className="w-full rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: showSocial ? "rgba(200,220,240,0.3)" : `${color}20`,
+                  border: `1px solid ${showSocial ? "rgba(200,220,240,0.5)" : `${color}40`}`,
+                }}
+              >
+                {showSocial ? "✕ Cerrar Social" : "🌍 Social HUB"}
+              </button>
+
               {/* Evolution Level + Creative Stats */}
               {(data.creativeXP ?? 0) > 0 && (
                 <>
@@ -405,6 +420,22 @@ export function PixSimDashboard({
               petPower={data.energy}
               stats={{ emotional: data.emotional, vital: data.vital, hunger: data.hunger }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* ===== SOCIAL HUB ===== */}
+      {showSocial && (
+        <div className="animate-fade-in px-4 pb-6 lg:px-8">
+          <div
+            className="mx-auto max-w-3xl overflow-hidden rounded-2xl"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              backdropFilter: "blur(16px)",
+            }}
+          >
+            <SocialTab />
           </div>
         </div>
       )}
