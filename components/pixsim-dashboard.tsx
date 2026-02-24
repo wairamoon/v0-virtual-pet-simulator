@@ -430,9 +430,7 @@ export function PixSimDashboard({
           <div
             className="mx-auto max-w-3xl overflow-hidden rounded-2xl"
             style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              backdropFilter: "blur(16px)",
+              background: "transparent",
             }}
           >
             <SocialTab />

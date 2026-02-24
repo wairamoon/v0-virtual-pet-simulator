@@ -76,12 +76,17 @@ export function RegisterHub({ onRegistered }: RegisterHubProps) {
     <div style={{
       display: "flex", flexDirection: "column", alignItems: "center",
       gap: "16px", padding: "24px", textAlign: "center",
+      background: "rgba(255,255,255,0.85)",
+      borderRadius: "16px",
+      border: "1px solid rgba(255,255,255,0.9)",
+      backdropFilter: "blur(16px)",
+      margin: "8px",
     }}>
       <div style={{ fontSize: "48px" }}>🌍</div>
-      <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#fff" }}>
+      <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#4a9eff" }}>
         Unirse al Social HUB
       </h2>
-      <p style={{ fontSize: "13px", color: "#aaa", maxWidth: "280px" }}>
+      <p style={{ fontSize: "13px", color: "#666", maxWidth: "280px" }}>
         Conecta tu PixSim con otros jugadores. Comparte tu progreso y compite en el leaderboard.
       </p>
 
@@ -92,14 +97,14 @@ export function RegisterHub({ onRegistered }: RegisterHubProps) {
         placeholder="Email (opcional)"
         style={{
           width: "100%", maxWidth: "280px", padding: "10px 14px",
-          borderRadius: "10px", border: "1px solid #333",
-          background: "#1a1a2e", color: "#fff", fontSize: "14px",
+          borderRadius: "10px", border: "1px solid #ccc",
+          background: "#fff", color: "#333", fontSize: "14px",
           outline: "none",
         }}
       />
 
       {error && (
-        <p style={{ fontSize: "12px", color: "#ff6b6b" }}>{error}</p>
+        <p style={{ fontSize: "12px", color: "#ff4444" }}>{error}</p>
       )}
 
       <button
@@ -108,7 +113,7 @@ export function RegisterHub({ onRegistered }: RegisterHubProps) {
         style={{
           width: "100%", maxWidth: "280px", padding: "12px",
           borderRadius: "10px", border: "none",
-          background: loading ? "#555" : "linear-gradient(135deg, #4dc9f6, #4d67ff)",
+          background: loading ? "#aaa" : "linear-gradient(135deg, #4dc9f6, #4d67ff)",
           color: "#fff", fontSize: "14px", fontWeight: "bold",
           cursor: loading ? "default" : "pointer",
           transition: "all 0.2s",
