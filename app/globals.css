@@ -112,7 +112,7 @@
 /* ─── Fire Companion (Calcifer) ─── */
 .fire-companion {
   position: absolute;
-  right: -60%;
+  right: -40%;
   bottom: 25%;
   width: 200px;
   height: 200px;
@@ -143,7 +143,7 @@
   .fire-companion {
     width: 250px;
     height: 250px;
-    right: -65%;
+    right: -45%;
     bottom: 25%;
   }
 }
