@@ -112,10 +112,10 @@
 /* ─── Fire Companion (Calcifer) ─── */
 .fire-companion {
   position: absolute;
-  right: -35%;
-  bottom: 10%;
-  width: 120px;
-  height: 120px;
+  right: -60%;
+  bottom: 25%;
+  width: 200px;
+  height: 200px;
   z-index: 15;
   animation: companion-float 3s ease-in-out infinite;
   filter: drop-shadow(0 4px 12px rgba(255, 87, 34, 0.4));
@@ -141,17 +141,17 @@
 /* Bigger on desktop */
 @media (min-width: 1025px) {
   .fire-companion {
-    width: 160px;
-    height: 160px;
-    right: -40%;
-    bottom: 15%;
+    width: 250px;
+    height: 250px;
+    right: -65%;
+    bottom: 25%;
   }
 }
 
 /* Smaller on tiny screens */
 @media (max-height: 700px) {
   .fire-companion {
-    width: 80px;
-    height: 80px;
+    width: 140px;
+    height: 140px;
   }
 }
