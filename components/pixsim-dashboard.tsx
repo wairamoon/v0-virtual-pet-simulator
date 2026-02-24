@@ -133,9 +133,14 @@ export function PixSimDashboard({
 
               {/* Water companion */}
               {(data.energy === "water" || data.energy === "aqua" || data.energy === "sky") && (
-                <div className="energy-companion water-companion" aria-label="Compañero de agua">
-                  <img src="/images/water-companion.png" alt="Water companion" className="companion-img" />
-                </div>
+                <>
+                  <div className="energy-companion water-companion" aria-label="Compañero de agua">
+                    <img src="/images/water-companion.png" alt="Water companion" className="companion-img" />
+                  </div>
+                  <div className="water-dolphin" aria-label="Delfín">
+                    <img src="/images/water-dolphin.png" alt="Dolphin" className="companion-img" />
+                  </div>
+                </>
               )}
             </div>
           </div>
