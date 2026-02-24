@@ -112,7 +112,7 @@
 /* ─── Energy Companions ─── */
 .energy-companion {
   position: absolute;
-  right: -40%;
+  right: -55%;
   bottom: 15%;
   width: 400px;
   height: 400px;
@@ -157,7 +157,7 @@
   .energy-companion {
     width: 500px;
     height: 500px;
-    right: -45%;
+    right: -55%;
     bottom: 15%;
   }
 }
