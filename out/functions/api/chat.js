@@ -79,10 +79,12 @@ SOLO extrae memorias si el usuario EXPLICITAMENTE menciona algo personal. No inv
     });
 
     if (!res.ok) {
-      console.error("OpenAI error:", await res.text());
+      const errText = await res.text();
+      console.error("OpenAI error:", res.status, errText);
       return Response.json({
-        reply: `*${petName} parpadea confundido* Mis sensores están fallando... 🌀`,
+        reply: `*${petName} parpadea* ¡Ups! Error ${res.status}. Intenta de nuevo en unos segundos 🔄`,
         newMemories: [],
+        debug: `HTTP ${res.status}`,
       });
     }
 
