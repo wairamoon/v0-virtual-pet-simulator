@@ -85,23 +85,23 @@ export function PixSimDashboard({
       <div className="flex flex-1 flex-col lg:flex-row items-center lg:items-stretch justify-center gap-4 p-4 pt-2 lg:gap-6 lg:p-8">
 
         {/* ===== LEFT: Avatar Area (60% on desktop) ===== */}
-        <div className="relative flex w-full flex-col items-center justify-center lg:w-[58%]">
-          {/* Power effect behind avatar */}
-          <div className="relative flex items-center justify-center" style={{ minHeight: "420px", perspective: "800px" }}>
+        <div className="avatar-stage-wrapper relative flex w-full flex-col items-center justify-center lg:w-[58%]">
+          {/* Avatar stage — absolute centered, 80vh */}
+          <div className="avatar-stage">
             <div className="absolute inset-0 overflow-hidden rounded-3xl">
               <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
             </div>
 
-            {/* Ground shadow (neutral, no color) */}
+            {/* Ground shadow */}
             <div
-              className="absolute bottom-2 left-1/2 -translate-x-1/2 h-4 w-36 rounded-full opacity-20 blur-[12px]"
+              className="absolute bottom-[10%] left-1/2 -translate-x-1/2 h-4 w-36 rounded-full opacity-20 blur-[12px]"
               style={{ backgroundColor: "#000" }}
               aria-hidden="true"
             />
 
-            {/* Avatar — large + evolution overlay */}
+            {/* Avatar — 80vh centered */}
             <div
-              className="relative z-10 animate-float"
+              className="avatar-float relative z-10"
               style={{
                 transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 transform: `rotateY(${avatarRotation}deg)`,
@@ -112,18 +112,19 @@ export function PixSimDashboard({
                 parts={data.character ?? defaultParts}
                 energyColor={color}
                 identity={data.identity}
-                size={260}
+                size={Math.round(typeof window !== "undefined" ? window.innerHeight * 0.5 : 320)}
+                className="avatar-image-80vh"
               />
               <EvolutionOverlay
                 level={getEvolutionLevel(data.creativeXP ?? 0).level}
-                size={260}
+                size={Math.round(typeof window !== "undefined" ? window.innerHeight * 0.5 : 320)}
                 color={getEvolutionLevel(data.creativeXP ?? 0).color}
               />
             </div>
           </div>
 
-          {/* Rotation arrows — 3D rotate avatar */}
-          <div className="mt-2 flex items-center gap-12">
+          {/* Rotation arrows — flanking avatar */}
+          <div className="avatar-arrows mt-2 flex items-center gap-12">
             <button
               type="button"
               onClick={() => rotateAvatar(-1)}

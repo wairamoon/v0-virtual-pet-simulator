@@ -72,7 +72,7 @@ export function CharacterAvatar({ parts, energyColor, identity, size = 200, clas
     <div className={`relative ${className}`}>
       {/* No aura — clean background */}
       <div
-        className="relative overflow-hidden rounded-2xl"
+        className="avatar-inner relative overflow-hidden rounded-2xl"
         style={{
           width: size,
           height: size * 1.5,

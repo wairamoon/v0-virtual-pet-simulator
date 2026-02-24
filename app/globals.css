@@ -41,3 +41,70 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── Avatar Stage: 80vh centered ─── */
+.avatar-stage-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.avatar-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.avatar-stage > * {
+  pointer-events: auto;
+}
+
+.avatar-image-80vh .avatar-inner {
+  width: auto !important;
+  height: 80vh !important;
+}
+
+.avatar-image-80vh .avatar-inner img {
+  height: 80vh !important;
+  width: auto !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  image-rendering: auto;
+  user-select: none;
+}
+
+.avatar-float {
+  animation: avatar-bob 3s ease-in-out infinite;
+}
+
+@keyframes avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.avatar-arrows {
+  position: relative;
+  z-index: 20;
+}
+
+/* On mobile, constrain height so UI stays accessible */
+@media (max-height: 700px) {
+  .avatar-image-80vh .avatar-inner,
+  .avatar-image-80vh .avatar-inner img {
+    height: 60vh !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .avatar-stage-wrapper {
+    height: auto;
+    min-height: 80vh;
+  }
+}
