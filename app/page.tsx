@@ -5,6 +5,7 @@ import { PixSimCreate, type PixSimData } from "@/components/pixsim-create"
 import { PixSimDashboard } from "@/components/pixsim-dashboard"
 import { AeroBackground } from "@/components/aero-background"
 import { UserHeader } from "@/components/user-header"
+import { MusicPlayer } from "@/components/music-player"
 
 const STORAGE_KEY = "pixsim-data"
 
@@ -62,6 +63,7 @@ export default function PixSimApp() {
   return (
     <main>
       <AeroBackground />
+      <MusicPlayer />
       <UserHeader />
       {data ? (
         <PixSimDashboard data={data} onReset={handleReset} />
