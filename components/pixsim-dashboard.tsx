@@ -88,8 +88,8 @@ export function PixSimDashboard({
         <div className="avatar-stage-wrapper relative flex w-full flex-col items-center justify-center lg:w-[58%]">
           {/* Avatar stage — absolute centered, 80vh */}
           <div className="avatar-stage">
-            {/* Power effect — hidden for fire/water (companions replace them) */}
-            {data.energy !== "fire" && data.energy !== "water" && data.energy !== "aqua" && data.energy !== "sky" && (
+            {/* Power effect — hidden when companion exists */}
+            {data.energy !== "fire" && data.energy !== "water" && data.energy !== "aqua" && data.energy !== "sky" && data.energy !== "earth" && (
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
                 <PowerEffect power={energyIcon[data.energy] ?? "water"} active={true} />
               </div>
@@ -141,6 +141,13 @@ export function PixSimDashboard({
                     <img src="/images/water-dolphin.png" alt="Dolphin" className="companion-img" />
                   </div>
                 </>
+              )}
+
+              {/* Earth companion */}
+              {(data.energy === "earth") && (
+                <div className="energy-companion earth-companion" aria-label="Compañero de tierra">
+                  <img src="/images/earth-companion.png" alt="Earth companion" className="companion-img" />
+                </div>
               )}
             </div>
           </div>
